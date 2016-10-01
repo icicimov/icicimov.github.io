@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T17:49:20+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</title><link href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" rel="alternate" type="text/html" title="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" /><published>2016-03-18T00:00:00+11:00</published><updated>2016-03-18T00:00:00+11:00</updated><id>http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system</id><content type="html" xml:base="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">&lt;p&gt;During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the &lt;a href=&quot;http://activemq.apache.org/shared-file-system-master-slave.html&quot;&gt;Apache project site&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;OCFS2 Warning&lt;/strong&gt;
+Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with &lt;code&gt;fcntl&lt;/code&gt; and not &lt;code&gt;lockf and flock&lt;/code&gt;, therefore mutex file locking from Java isn&amp;#39;t supported.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;From &lt;a href=&quot;http://sources.redhat.com/cluster/faq.html#gfs_vs_ocfs2&quot;&gt;RedHat faq&lt;/a&gt; :&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;OCFS2: No cluster-aware flock or POSIX locks&lt;/p&gt;
+
+&lt;p&gt;GFS: fully supports Cluster-wide flocks and POSIX locks and is supported.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;See this JIRA for more discussion: &lt;a href=&quot;https://issues.apache.org/jira/browse/AMQ-4378&quot;&gt;AMQ-4378&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;And true enough, when tested ActiveMQ-5.11.1 on one of the OCFS2 clusters, what happened is that both servers started as master due to lack of lock file on the share. Investigating further it came up that some good man created a patch that Apache never bothered to apply from some unknown reason. The case link &lt;a href=&quot;https://issues.apache.org/jira/browse/AMQ-4694&quot;&gt;AMQ-4694&lt;/a&gt;. The patch was attached to the ticket so thought I would try it and apply to latest 5.11.4 version.&lt;/p&gt;
+
+&lt;p&gt;Downloaded the source:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# aptitude install zip
+root@drbd01:~# wget http://mirror.ventraip.net.au/apache/activemq/5.11.4/activemq-parent-5.11.4-source-release.zip
+root@drbd01:~# unzip activemq-parent-5.11.4-source-release.zip
+root@drbd01:~# cd activemq-parent-5.11.4/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and applied the patch:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi ocfs2-locks.patch
+root@drbd01:~/activemq-parent-5.11.4# patch -p0 -i ocfs2-locks.patch
+patching file NOTICE
+Hunk #1 succeeded at 45 with fuzz 2 (offset -4 lines).
+patching file activemq-broker/pom.xml
+patching file activemq-broker/src/main/java/org/apache/activemq/store/AbstractResourceLocker.java
+patching file activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
+Hunk #1 FAILED at 16.
+1 out of 1 hunk FAILED -- saving rejects to file activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java.rej
+patching file activemq-broker/src/main/java/org/apache/activemq/store/SharedNativeFileLocker.java
+patching file activemq-broker/src/main/java/org/apache/activemq/util/LockFile.java
+patching file activemq-broker/src/main/java/org/apache/activemq/util/LockResource.java
+patching file activemq-broker/src/main/java/org/apache/activemq/util/NativeLockFile.java
+patching file activemq-unit-tests/src/test/java/org/apache/activemq/util/NativeLockFileTest.java
+patching file assembly/pom.xml
+Hunk #1 succeeded at 342 (offset 14 lines).
+patching file assembly/src/main/descriptors/common-bin.xml
+Hunk #1 succeeded at 191 (offset -9 lines).
+patching file pom.xml
+Hunk #1 succeeded at 881 with fuzz 1 (offset 44 lines).
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Ok, so all good except it failed for the SharedFileLocker.java file. Easily fixed by applying that part of the patch manually:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &amp;quot;License&amp;quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &amp;quot;AS IS&amp;quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.activemq.store;
+
+import java.io.File;
+import org.apache.activemq.util.LockFile;
+import org.apache.activemq.util.LockResource;
+
+/**
+ * An {@link AbstractResourceLocker} that utilizes a {@link LockFile}.
+ *
+ * @org.apache.xbean.XBean element=&amp;quot;shared-file-locker&amp;quot;
+ *
+ */
+public class SharedFileLocker extends AbstractResourceLocker {
+
+    @Override
+    protected LockResource newLockResource(File lockFileName) {
+        return new LockFile(lockFileName, true);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Next installed Maven:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# wget http://apache.uberglobalmirror.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+root@drbd01:~# tar -xzvf apache-maven-3.3.9-bin.tar.gz
+root@drbd01:~# mv apache-maven-3.3.9 /usr/local/
+root@drbd01:~# export PATH=/usr/local/apache-maven-3.3.9/bin:$PATH
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Back to AMQ directory and build the project:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# mvn -Dtest=false -DfailIfNoTests=false clean install -e -X
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Install the built binaries:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# tar -xzvf /root/.m2/repository/org/apache/activemq/apache-activemq/5.11.4/apache-activemq-5.11.4-bin.tar.gz -C /opt/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and copy the setup from the previous AMQ version into the new one:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# cp -a apache-activemq-5.11.1/conf/{log4j.properties,jmx.access,jmx.password,jetty.xml,encompass-activemq.xml,star_encompasshost_com.jks} apache-activemq-5.11.4/conf/
+root@drbd01:/opt# chown -R activemq\: apache-activemq-5.11.4
+root@drbd01:/opt# rm activemq
+root@drbd01:/opt# ln -s apache-activemq-5.11.4 activemq
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The last bit is modifying the KahaDB locker to use the newly introduced shared-native-file-locker one:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# vi activemq/conf/activemq.xml
+[...]
+    &amp;lt;persistenceAdapter&amp;gt;
+        &amp;lt;kahaDB directory=&amp;quot;/share/activemq-data&amp;quot;
+               indexCacheSize=&amp;quot;40000&amp;quot;
+               checkForCorruptJournalFiles=&amp;quot;true&amp;quot;&amp;gt;
+               &amp;lt;locker&amp;gt;
+                  &amp;lt;shared-native-file-locker lockAcquireSleepInterval=&amp;quot;5000&amp;quot;/&amp;gt;
+               &amp;lt;/locker&amp;gt;
+         &amp;lt;/kahaDB&amp;gt;
+    &amp;lt;/persistenceAdapter&amp;gt;
+[...]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After copying over the binary tarball to the other server, installing and performing the above steps, I started the server and the lock file was indeed created this time:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# ls -ltr /share/activemq-data/
+total 160
+drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
+-rw-r--r-- 1 root     root            5 Mar 17 15:30 test
+-rw-r--r-- 1 activemq activemq        0 Mar 17 18:16 lock
+-rw-r--r-- 1 activemq activemq 33030144 Mar 17 18:17 db-1.log
+-rw-r--r-- 1 activemq activemq    12304 Mar 17 18:17 db.redo
+-rw-r--r-- 1 activemq activemq    12288 Mar 17 18:17 db.data
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and the other server can see it:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd02:/opt# start activemq &amp;amp;&amp;amp; tail -f /opt/activemq/data/activemq.log | grep -i lock
+2016-03-18 10:00:15,375 | INFO  | Database /share/activemq-data/lock is locked... waiting 5 seconds for the database to be unlocked. Reason: java.io.IOException: failed to acquire lock: [11] ( | org.apache.activemq.store.SharedNativeFileLocker | main
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><summary>During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the Apache project site:</summary></entry><entry><title>HAProxy dynamically adjust server weight using external agent</title><link href="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/" rel="alternate" type="text/html" title="HAProxy dynamically adjust server weight using external agent" /><published>2015-10-13T00:00:00+11:00</published><updated>2015-10-13T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">&lt;h2&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Trying to utilize HAProxy-1.5/1.6 &lt;code&gt;agent-check&lt;/code&gt; feature, see &lt;a href=&quot;http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check&quot;&gt;HAProxy documentation&lt;/a&gt;, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.&lt;/p&gt;
+
+&lt;p&gt;This will run as xinetd service on the Tomcats, for example made available to HAP on port 9707 (some randomly chosen free port).&lt;/p&gt;
+
+&lt;p&gt;Explanation how is this going to work. Each server starts with weight of 100. This health check will run every 5 minutes lets say (the primary runs every 10 seconds) and the agent will return &amp;quot;up&amp;quot; plus weight value or &amp;quot;down&amp;quot; upon heath check. The weight percentage returned is calculated based on the system load in the last 5 minutes (can be 1 or 15 min. too), ie if load is below 90% it will return weight of 100, between 90% and 100% it will reduce the weight to 50% (meaning HAP will send only 25% of the connections to this server in case of 2 servers) and if 100% it will mark this server down.&lt;/p&gt;
+
+&lt;p&gt;This additional, lets call it secondary, heath check will work in conjunction with the already existing one, which only checks if the service is up or down, and provide flexibility in terms of backend load.&lt;/p&gt;
+
+&lt;h2&gt;Setup&lt;/h2&gt;
+
+&lt;h3&gt;On the backends (Tomcat app servers)&lt;/h3&gt;
+
+&lt;p&gt;Create agent-check script &lt;code&gt;/usr/local/bin/haproxy-agent-check&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;LMAX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;90
+
+&lt;span class=&quot;nv&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;uptime &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep -E -o &lt;span class=&quot;s1&quot;&gt;&amp;#39;load average[s:][: ].*&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/,//g&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d&lt;span class=&quot;s1&quot;&gt;&amp;#39; &amp;#39;&lt;/span&gt; -f3-5&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;cpus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;grep processor /proc/cpuinfo &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; wc -l&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r l1 l5 l15&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;l5util&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$l5/$cpus*100&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; bc -l &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d&lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt; -f1&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;up 100%&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -gt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt &lt;span class=&quot;m&quot;&gt;100&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;up 50%&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;down#CPU overload&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &amp;lt; &amp;lt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Set it to be executable:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21:~# chmod +x /usr/local/bin/haproxy-agent-check
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Next we set it as xinetd service, first install xinetd:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21:~# aptitude install -y xinetd
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then add our service to the system services in &lt;code&gt;/etc/services&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;...
+haproxy-agent-check 9707/tcp                # haproxy-agent-check
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Create the xinetd daemon file &lt;code&gt;/etc/xinetd.d/haproxy-agent-check&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;# default: on
+# description: haproxy-agent-check
+service haproxy-agent-check
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        port            = 9707
+        wait            = no
+        user            = nobody
+        server          = /usr/local/bin/haproxy-agent-check
+        log_on_failure  += USERID
+        only_from       = 172.31.17.11 172.31.11.11 127.0.0.1
+        per_source      = UNLIMITED
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;To allow access from specific subnets instead of hosts we can use the following format:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;only_from       = 10.22.0.0 10.22.1.0 10.22.2.0 127.0.0.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Make it executable, restart xinetd and test:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21-hap:~# chmod +x /etc/xinetd.d/haproxy-agent-check
+root@app21-:~# service xinetd restart
+root@app21:~# telnet 127.0.0.1 9707
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is &amp;#39;^]&amp;#39;.
+up 100%
+Connection closed by foreign host.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;All looks good so we can setup the HAP&amp;#39;s now.&lt;/p&gt;
+
+&lt;h1&gt;On the HAProxy LB&amp;#39;s&lt;/h1&gt;
+
+&lt;p&gt;Open the TCP port 9707 in the APP servers firewall and Test the agent-check connectivity from HAP serers to the app servers:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@lb1:~# telnet ip-172-31-17-41 9707
+Trying 172.31.17.41...
+Connected to ip-172-31-17-41.ap-southeast-2.compute.internal.
+Escape character is &amp;#39;^]&amp;#39;.
+up 100%
+Connection closed by foreign host.
+
+root@lb1:~# telnet ip-172-31-11-41 9707
+Trying 172.31.11.41...
+Connected to ip-172-31-11-41.ap-southeast-2.compute.internal.
+Escape character is &amp;#39;^]&amp;#39;.
+up 100%
+Connection closed by foreign host.
+root@lb1:~#
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Add &lt;code&gt;agent-check&lt;/code&gt;, &lt;code&gt;agent-port&lt;/code&gt; and &lt;code&gt;agent-inter&lt;/code&gt; parameters to the backend servers in the &lt;code&gt;/etc/haproxy/haproxy.cfg&lt;/code&gt; config file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;...
+listen https-in
+...
+    default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 200 maxqueue 250 weight 100 error-limit 10 on-error mark-down on-marked-down shutdown-sessions agent-port 9707 agent-inter 30s
+    server ip-172-31-17-41  ip-172-31-17-41:8080  check agent-check observe layer7
+    server ip-172-31-11-41  ip-172-31-11-41:8080  check agent-check observe layer7
+    server localhost 127.0.0.1:8080 maxconn 500 backup weight 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And reload HAP service. Check the health status:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@lb1:~# echo &amp;quot;show stat&amp;quot; | socat stdio unix-connect:/run/haproxy/admin.sock | cut -d &amp;#39;,&amp;#39; -f1,2,18,19 | grep https
+https-in,ip-172-31-17-41,UP,100
+https-in,ip-172-31-11-41,UP,100
+https-in,localhost,no check,1
+https-in,BACKEND,UP,200
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><summary>Introduction</summary></entry><entry><title>You&amp;#39;re up and running!</title><link href="http://icicimov.github.io/Hello-World/" rel="alternate" type="text/html" title="You're up and running!" /><published>2014-03-03T00:00:00+11:00</published><updated>2014-03-03T00:00:00+11:00</updated><id>http://icicimov.github.io/Hello-World</id><content type="html" xml:base="http://icicimov.github.io/Hello-World/">&lt;p&gt;Next you can update your site name, avatar and other options using the _config.yml file in the root of your repository (shown below).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/config.png&quot; alt=&quot;_config.yml&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;The easiest way to make your first post is to edit this one. Go into /_posts/ and update the Hello World markdown file. For more instructions head over to the &lt;a href=&quot;https://github.com/barryclark/jekyll-now&quot;&gt;Jekyll Now repository&lt;/a&gt; on GitHub.&lt;/p&gt;</content><summary>Next you can update your site name, avatar and other options using the _config.yml file in the root of your repository (shown below).</summary></entry></feed>
