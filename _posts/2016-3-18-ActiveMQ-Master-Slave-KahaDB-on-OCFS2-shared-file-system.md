@@ -1,5 +1,6 @@
 ---
 layout: post
+comments: true
 title: ActiveMQ Master/Slave KahaDB on OCFS2 shared file system
 ---
 
