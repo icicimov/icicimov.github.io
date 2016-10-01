@@ -1,8 +1,14 @@
 ---
 layout: post
 comments: true
+author:
+  name: Igor Cicimov
+  email: igorc@encompasscorporation.com
+description: 'Activemq locks with OCFS2'
+keywords: 'activemq,ocfs2'
+license: '[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0)'
 title: ActiveMQ Master/Slave KahaDB on OCFS2 shared file system
-category: server
+category: Server
 tags: [activemq, ocfs2]
 ---
 

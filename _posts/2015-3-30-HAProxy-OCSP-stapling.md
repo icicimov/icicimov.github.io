@@ -8,7 +8,7 @@ description: 'Introduction to OCSP and OCSP stapling and HAProxy OCSP stapling u
 keywords: 'haproxy,ocsp'
 license: '[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0)'
 title: 'HAProxy OCSP stapling'
-category: server
+category: Server
 tags: [haproxy, ocsp]
 ---
 
