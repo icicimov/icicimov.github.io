@@ -58,8 +58,9 @@
     <p>During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the <a href="http://activemq.apache.org/shared-file-system-master-slave.html">Apache project site</a>:</p>
 
 <blockquote>
-<p><strong>OCFS2 Warning</strong>
-Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with <code>fcntl</code> and not <code>lockf and flock</code>, therefore mutex file locking from Java isn&#39;t supported.</p>
+<p><strong>OCFS2 Warning</strong></p>
+
+<p>Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with <code>fcntl</code> and not <code>lockf and flock</code>, therefore mutex file locking from Java isn&#39;t supported.</p>
 </blockquote>
 
 <p>From <a href="http://sources.redhat.com/cluster/faq.html#gfs_vs_ocfs2">RedHat faq</a> :</p>

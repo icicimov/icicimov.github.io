@@ -1,8 +1,367 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T21:03:05+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</title><link href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" rel="alternate" type="text/html" title="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" /><published>2016-03-18T00:00:00+11:00</published><updated>2016-03-18T00:00:00+11:00</updated><id>http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system</id><content type="html" xml:base="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">&lt;p&gt;During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the &lt;a href=&quot;http://activemq.apache.org/shared-file-system-master-slave.html&quot;&gt;Apache project site&lt;/a&gt;:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T21:29:57+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;h2&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
+
+&lt;p&gt;The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&amp;#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.&lt;/p&gt;
+
+&lt;p&gt;Nice things to have so I setup a test Tomcat9 server on Ubunut 14.04.&lt;/p&gt;
+
+&lt;h2&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;We start by installing and setup of the prerequisites mentioned in the Introduction.&lt;/p&gt;
+
+&lt;h3&gt;OpenSSL&lt;/h3&gt;
+
+&lt;p&gt;Standard compile procedure, we start by installing some needed packages:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and then downloading and extracting the source:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo wget http://www.openssl.org/source/openssl-1.0.2g.tar.gz
+igorc@sl01:/opt$ sudo tar -xzf openssl-1.0.2g.tar.gz
+igorc@sl01:/opt$ sudo chown -R igorc\: openssl-1.0.2g
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Next we change to the source directory and create the openssl.ld file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ cd openssl-1.0.2g/
+igorc@sl01:~/openssl-1.0.2g$ vi openssl.ld
+OPENSSL_1.0.0 {
+    global:
+    *;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and finally compile and install the software:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ./config --prefix=/opt/openssl zlib-dynamic shared -Wl,--version-script=/home/igorc/openssl-1.0.2g/openssl.ld -Wl,-Bsymbolic-functions
+igorc@sl01:/opt/openssl-1.0.2g$ make depend
+igorc@sl01:/opt/openssl-1.0.2g$ make all
+igorc@sl01:/opt/openssl-1.0.2g$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This will set OpenSSL 1.0.2g under /opt/openssl directory:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ls -l /opt/openssl
+total 16
+drwxr-xr-x 2 root root 4096 Apr  2 19:18 bin
+drwxr-xr-x 3 root root 4096 Apr  2 19:18 include
+drwxr-xr-x 4 root root 4096 Apr  2 19:18 lib
+drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;Java8&lt;/h3&gt;
+
+&lt;p&gt;One liner installation:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;amp;&amp;amp; echo &amp;quot;deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&amp;quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; echo &amp;quot;deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&amp;quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;amp;&amp;amp; sudo aptitude update &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-installer &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-set-default
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This will add the needed Ubuntu ppa, install the latest Oracle 1.8 JDK and set it as default Java environment.&lt;/p&gt;
+
+&lt;h3&gt;Tomcat9&lt;/h3&gt;
+
+&lt;h4&gt;Installation&lt;/h4&gt;
+
+&lt;p&gt;Get and unpack the latest Tomcat9 release, alfa version v9.0.0.M4 at the moment of this writing, and setup tomcat user:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
+igorc@sl01:/opt$ sudo useradd -r -c &amp;quot;Tomcat9 user&amp;quot; -s /bin/false -M -d /usr/share/tomcat9 -g 501 -u 501 -G www-data tomcat9
+igorc@sl01:/opt$ sudo wget http://apache.uberglobalmirror.com/tomcat/tomcat-9/v9.0.0.M4/bin/apache-tomcat-9.0.0.M4.tar.gz
+igorc@sl01:/opt$ sudo tar -xzf apache-tomcat-9.0.0.M4.tar.gz
+igorc@sl01:/opt$ sudo mv apache-tomcat-9.0.0.M4 /usr/share/tomcat9
+igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/logs /var/log/tomcat9
+igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/work /var/cache/tomcat9
+igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/conf /etc/tomcat9
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;TC-Native&lt;/h4&gt;
+
+&lt;p&gt;We install the needed packages first:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and then we download and etract the tcnative source, xtract and build it against oopenssl-1.0.2g we installed previously:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo wget http://apache.mirror.digitalpacific.com.au/tomcat/tomcat-connectors/native/1.2.5/source/tomcat-native-1.2.5-src.tar.gz
+igorc@sl01:/opt$ sudo tar -xzf tomcat-native-1.2.5-src.tar.gz
+igorc@sl01:/opt$ cd tomcat-native-1.2.5-src/native
+igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ./configure --prefix=/usr --libdir=/usr/lib --with-apr=/usr/bin/apr-1-config --with-java-home=/usr/lib/jvm/java-8-oracle --with-ssl=/opt/openssl
+igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ make
+igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We check that tcnative is properly linked to the right openssl version (in case you have more than one installed):&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ldd /usr/lib/libtcnative-1.so.0.2.5
+linux-vdso.so.1 =&amp;gt;  (0x00007ffcd2ba5000)
+libssl.so.1.0.0 =&amp;gt; /opt/openssl/lib/libssl.so.1.0.0 (0x00007f67d06a1000)
+libcrypto.so.1.0.0 =&amp;gt; /opt/openssl/lib/libcrypto.so.1.0.0 (0x00007f67d0251000)
+libapr-1.so.0 =&amp;gt; /usr/lib/x86_64-linux-gnu/libapr-1.so.0 (0x00007f67d0020000)
+libpthread.so.0 =&amp;gt; /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f67cfe02000)
+libc.so.6 =&amp;gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f67cfa3d000)
+libdl.so.2 =&amp;gt; /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f67cf839000)
+libz.so.1 =&amp;gt; /lib/x86_64-linux-gnu/libz.so.1 (0x00007f67cf620000)
+libuuid.so.1 =&amp;gt; /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007f67cf41b000)
+/lib64/ld-linux-x86-64.so.2 (0x00007f67d0b3e000)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4&gt;Config and SSL setup&lt;/h4&gt;
+
+&lt;p&gt;I wanted to test the ECDSA certificate type and multi-certificate support in tomcat9. First create ECC cert and install it so tomcat can find it:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&amp;lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj &amp;#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&amp;#39;
+igorc@sl01:~$ sudo mkdir /etc/tomcat9/ssl
+igorc@sl01:~$ sudo cp cert_ecdsa.key cert_ecdsa.crt /etc/tomcat9/ssl/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then created a standard RSA one too:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+igorc@sl01:~$ openssl rsa -passin pass:x -in server.pass.key -out server.key
+igorc@sl01:~$ rm server.pass.key
+igorc@sl01:~$ openssl req -new -key server.key -out server.csr -subj &amp;#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&amp;#39;
+igorc@sl01:~$ openssl x509 -req -days 7200 -in server.csr -signkey server.key -out server.crt
+Signature ok
+subject=/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com
+Getting Private key
+igorc@sl01:~$ sudo cp server.key server.crt /etc/tomcat9/ssl/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now we can configure tomcat9&amp;#39;s SSL/TLS connector with HTTP/2 support. Replace the default &lt;code&gt;&amp;lt;Connector&amp;gt;&lt;/code&gt; section in the tomcat&amp;#39;s server.xml file, in our case &lt;code&gt;/etc/tomcat9/server.xml&lt;/code&gt;, with the one below:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;    &amp;lt;Connector port=&amp;quot;8443&amp;quot; protocol=&amp;quot;org.apache.coyote.http11.Http11AprProtocol&amp;quot;
+               maxThreads=&amp;quot;150&amp;quot; SSLEnabled=&amp;quot;true&amp;quot; scheme=&amp;quot;https&amp;quot; secure=&amp;quot;true&amp;quot; &amp;gt;
+        &amp;lt;UpgradeProtocol className=&amp;quot;org.apache.coyote.http2.Http2Protocol&amp;quot; /&amp;gt;
+        &amp;lt;SSLHostConfig honorCipherOrder=&amp;quot;true&amp;quot; disableCompression=&amp;quot;true&amp;quot; protocols=&amp;quot;all&amp;quot;
+                       ciphers=&amp;quot;EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384
+                       EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4
+                       EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4&amp;quot; &amp;gt;
+            &amp;lt;Certificate certificateKeyFile=&amp;quot;conf/ssl/cert_ecdsa.key&amp;quot;
+                         certificateFile=&amp;quot;conf/ssl/cert_ecdsa.crt&amp;quot;
+                         type=&amp;quot;EC&amp;quot; /&amp;gt;
+            &amp;lt;Certificate certificateKeyFile=&amp;quot;conf/ssl/server.key&amp;quot;
+                         certificateFile=&amp;quot;conf/ssl/server.crt&amp;quot;
+                         type=&amp;quot;RSA&amp;quot; /&amp;gt;
+        &amp;lt;/SSLHostConfig&amp;gt;
+    &amp;lt;/Connector&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now we can start the server:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo /usr/share/tomcat9/bin/startup.sh
+Using CATALINA_BASE:   /usr/share/tomcat9
+Using CATALINA_HOME:   /usr/share/tomcat9
+Using CATALINA_TMPDIR: /usr/share/tomcat9/temp
+Using JRE_HOME:        /usr
+Using CLASSPATH:       /usr/share/tomcat9/bin/bootstrap.jar:/usr/share/tomcat9/bin/tomcat-juli.jar
+Tomcat started.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and check for the features we need in the log file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo grep -E &amp;quot;AprLifecycleListener|h2&amp;quot; /var/log/tomcat9/catalina.out
+02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded APR based Apache Tomcat Native library 1.2.5 using APR version 1.5.1.
+02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+02-Apr-2016 20:29:05.881 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized (OpenSSL 1.0.2g  1 Mar 2016)
+02-Apr-2016 20:29:05.883 INFO [main] org.apache.coyote.http11.AbstractHttp11Protocol.configureUpgradeProtocol The [&amp;quot;https-apr-8443&amp;quot;] connector has been configured to support negotiation to [h2] via ALPN
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can see the APR connector, the correct OpenSSL version and the h2 protocol available via ALPN (Application-Layer Protocol Negotiation).&lt;/p&gt;
+
+&lt;h2&gt;Testing&lt;/h2&gt;
+
+&lt;h3&gt;CuRL&lt;/h3&gt;
+
+&lt;p&gt;To test the server I used the trusted curl. It came up it was little bit painful to set it up due to lot of prerequisites but since I&amp;#39;ve done it I might show it here as well. There are some other HTTP/2 testing tools available that you can use in case you have domain name registered with proper DNS resolution setup.&lt;/p&gt;
+
+&lt;p&gt;First the SPDY (Google extension which is now becoming obsolete with http2) support:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ git clone https://github.com/tatsuhiro-t/spdylay.git
+igorc@sl01:~$ cd spdylay/
+igorc@sl01:~$ autoreconf -i
+igorc@sl01:~$ automake
+igorc@sl01:~$ autoconf
+igorc@sl01:~$ ./configure
+igorc@sl01:~$ make -I/opt/openssl/include/
+igorc@sl01:~$ sudo make install
+igorc@sl01:~$ locate libspdylay.so.7
+/opt/spdylay/lib/.libs/libspdylay.so.7
+/opt/spdylay/lib/.libs/libspdylay.so.7.2.0
+/usr/local/lib/libspdylay.so.7
+/usr/local/lib/libspdylay.so.7.2.0
+igorc@sl01:~$ sudo ln -s /usr/local/lib/libspdylay.so.7 /lib/x86_64-linux-gnu/libspdylay.so.7
+igorc@sl01:~$ sudo ln -s /usr/local/lib/libspdylay.so.7.2.0 /lib/x86_64-linux-gnu/libspdylay.so.7.2.0
+igorc@sl01:~$ sudo ldconfig
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Next is nghhtp2:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ git clone https://github.com/nghttp2/nghttp2.git
+igorc@sl01:~$ cd nghttp2
+igorc@sl01:~$ autoreconf -i
+igorc@sl01:~$ automake
+igorc@sl01:~$ autoconf
+igorc@sl01:~$ OPENSSL_CFLAGS=&amp;quot;-I/opt/openssl/include&amp;quot; OPENSSL_LIBS=&amp;quot;-L/opt/openssl/lib -lssl -lcrypto -ldl&amp;quot; ./configure PYTHON=/usr/bin/python3
+igorc@sl01:~$ make
+igorc@sl01:~$ sudo make install
+igorc@sl01:~$ sudo updatedb
+igorc@sl01:~$ locate libnghttp2.so.14
+/opt/nghttp2/lib/.libs/libnghttp2.so.14
+/opt/nghttp2/lib/.libs/libnghttp2.so.14.6.0
+/opt/nghttp2-1.9.1/lib/.libs/libnghttp2.so.14
+/opt/nghttp2-1.9.1/lib/.libs/libnghttp2.so.14.6.0
+/usr/local/lib/libnghttp2.so.14
+/usr/local/lib/libnghttp2.so.14.6.0
+igorc@sl01:~$ sudo ln -s /usr/local/lib/libnghttp2.so.14 /lib/x86_64-linux-gnu/libnghttp2.so.14
+igorc@sl01:~$ sudo ln -s /usr/local/lib/libnghttp2.so.14.0.2 /lib/x86_64-linux-gnu/libnghttp2.so.14.0.2
+igorc@sl01:~$ sudo ldconfig
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Finally checking the versions installed:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ nghttp --version
+nghttp nghttp2/1.10.0-DEV
+igorc@sl01:~$ nghttpx --version
+nghttpx nghttp2/1.10.0-DEV
+igorc@sl01:~$ nghttpd --version
+nghttpd nghttp2/1.10.0-DEV
+igorc@sl01:~$ h2load --version
+h2load nghttp2/1.10.0-DEV
+
+We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;$ sudo nghttpx \
+    --frontend=*,443 \
+    --backend=localhost,8080 \
+    --private-key-file=/path/to/key.key \
+    --certificate-file=/path/to/cert.crt
+```&lt;/p&gt;
+
+&lt;p&gt;Or turn it into service:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
+$ sudo service nghttpx restart
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And finally CuRL:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ wget https://curl.haxx.se/download/curl-7.48.0.tar.gz
+igorc@sl01:~$ tar -xzf curl-7.48.0.tar.gz
+igorc@sl01:~$ cd curl-7.48.0/
+igorc@sl01:~$ PKG_CONFIG_LIBDIR=/opt/openssl/lib/pkgconfig/ ./configure --with-ssl=/opt/openssl --with-nghttp2=/usr/local
+igorc@sl01:~$ make &amp;amp;&amp;amp; sudo make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now we set the correct binary and library paths so curl can find them:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ export PATH=/opt/openssl/bin:/usr/local/bin:igorc@sl01:~$PATH
+igorc@sl01:~$ export LD_LIBRARY_PATH=/opt/openssl/lib:igorc@sl01:~$LD_LIBRARY_PATH
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Check the openssl and curl binaries and their features:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl version
+OpenSSL 1.0.2g  1 Mar 2016
+
+igorc@sl01:~$ curl --version
+curl 7.48.0 (x86_64-pc-linux-gnu) libcurl/7.48.0 OpenSSL/1.0.2g zlib/1.2.8 nghttp2/1.10.0-DEV
+Protocols: dict file ftp ftps gopher http https imap imaps pop3 pop3s rtsp smb smbs smtp smtps telnet tftp
+Features: IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP HTTP2 UnixSockets
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;From the above output we can confirm that curl has http2 support.&lt;/p&gt;
+
+&lt;p&gt;With all this done we can run the test. I tested for both when we have only ECDSA/ECC certificate configured in tomcat, since I wanted to see this cert in action:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+*   Trying 127.0.0.1...
+* Connected to localhost (127.0.0.1) port 8443 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: none
+* TLSv1.2 (OUT), TLS header, Certificate Status (22):
+} [5 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server hello (2):
+{ [75 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [710 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [181 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [70 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Client hello (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS change cipher, Client hello (1):
+{ [1 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-ECDSA-AES256-GCM-SHA384
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: C=AU; ST=New South Wales; L=Sydney; O=My Corporation Ltd.; OU=DevOps; CN=tomcat9.mydomain.com
+*  start date: Apr  4 02:41:03 2016 GMT
+*  expire date: Dec 21 02:41:03 2035 GMT
+*  issuer: C=AU; ST=New South Wales; L=Sydney; O=My Corporation Ltd.; OU=DevOps; CN=tomcat9.mydomain.com
+*  SSL certificate verify result: self signed certificate (18), continuing anyway.
+* Using HTTP2, server supports multi-use
+* Connection state changed (HTTP/2 confirmed)
+* TCP_NODELAY set
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+} [5 bytes data]
+* Using Stream ID: 1 (easy handle 0x22dc050)
+} [5 bytes data]
+&amp;gt; HEAD / HTTP/1.1
+&amp;gt; Host: localhost:8443
+&amp;gt; User-Agent: curl/7.48.0
+&amp;gt; Accept: */*
+&amp;gt;
+{ [5 bytes data]
+* Connection state changed (MAX_CONCURRENT_STREAMS updated)!
+} [5 bytes data]
+&amp;lt; HTTP/2.0 200
+&amp;lt; content-type:text/html;charset=UTF-8
+&amp;lt; date:Mon, 04 Apr 2016 02:45:38 GMT
+&amp;lt;
+* Connection #0 to host localhost left intact
+igorc@sl01:~$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and when both cert types are configured as per our example above:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+*   Trying 127.0.0.1...
+* Connected to localhost (127.0.0.1) port 8443 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+* successfully set certificate verify locations:
+*   CAfile: /etc/ssl/certs/ca-certificates.crt
+  CApath: none
+* TLSv1.2 (OUT), TLS header, Certificate Status (22):
+} [5 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server hello (2):
+{ [75 bytes data]
+* TLSv1.2 (IN), TLS handshake, Certificate (11):
+{ [958 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server key exchange (12):
+{ [333 bytes data]
+* TLSv1.2 (IN), TLS handshake, Server finished (14):
+{ [4 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
+} [70 bytes data]
+* TLSv1.2 (OUT), TLS change cipher, Client hello (1):
+} [1 bytes data]
+* TLSv1.2 (OUT), TLS handshake, Finished (20):
+} [16 bytes data]
+* TLSv1.2 (IN), TLS change cipher, Client hello (1):
+{ [1 bytes data]
+* TLSv1.2 (IN), TLS handshake, Finished (20):
+{ [16 bytes data]
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES256-GCM-SHA384
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: C=AU; ST=New South Wales; L=Sydney; O=My Corporation Ltd.; OU=DevOps; CN=tomcat9.mydomain.com
+*  start date: Apr  4 02:07:04 2016 GMT
+*  expire date: Dec 21 02:07:04 2035 GMT
+*  issuer: C=AU; ST=New South Wales; L=Sydney; O=My Corporation Ltd.; OU=DevOps; CN=tomcat9.mydomain.com
+*  SSL certificate verify result: self signed certificate (18), continuing anyway.
+* Using HTTP2, server supports multi-use
+* Connection state changed (HTTP/2 confirmed)
+* TCP_NODELAY set
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+} [5 bytes data]
+* Using Stream ID: 1 (easy handle 0x1387050)
+} [5 bytes data]
+&amp;gt; HEAD / HTTP/1.1
+&amp;gt; Host: localhost:8443
+&amp;gt; User-Agent: curl/7.48.0
+&amp;gt; Accept: */*
+&amp;gt;
+{ [5 bytes data]
+* Connection state changed (MAX_CONCURRENT_STREAMS updated)!
+} [5 bytes data]
+&amp;lt; HTTP/2.0 200
+&amp;lt; content-type:text/html;charset=UTF-8
+&amp;lt; date:Mon, 04 Apr 2016 02:21:07 GMT
+&amp;lt;
+* Connection #0 to host localhost left intact
+igorc@sl01:~$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;in which case the server sends the RSA type (notice the different start and expire dates). In both cases we can see HTTP/2 connection being established.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><summary>Introduction</summary></entry><entry><title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</title><link href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" rel="alternate" type="text/html" title="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" /><published>2016-03-18T00:00:00+11:00</published><updated>2016-03-18T00:00:00+11:00</updated><id>http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system</id><content type="html" xml:base="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">&lt;p&gt;During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the &lt;a href=&quot;http://activemq.apache.org/shared-file-system-master-slave.html&quot;&gt;Apache project site&lt;/a&gt;:&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;OCFS2 Warning&lt;/strong&gt;
-Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with &lt;code&gt;fcntl&lt;/code&gt; and not &lt;code&gt;lockf and flock&lt;/code&gt;, therefore mutex file locking from Java isn&amp;#39;t supported.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;OCFS2 Warning&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with &lt;code&gt;fcntl&lt;/code&gt; and not &lt;code&gt;lockf and flock&lt;/code&gt;, therefore mutex file locking from Java isn&amp;#39;t supported.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;From &lt;a href=&quot;http://sources.redhat.com/cluster/faq.html#gfs_vs_ocfs2&quot;&gt;RedHat faq&lt;/a&gt; :&lt;/p&gt;
