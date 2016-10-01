@@ -9,9 +9,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
 
     
-    <meta name="description" content="Introduction
+    <meta name="description" content="Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.
 " />
-    <meta property="og:description" content="Introduction
+    <meta property="og:description" content="Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.
 " />
     
     <meta name="author" content="Igor Cicimov" />
@@ -55,9 +55,7 @@
   <h1>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</h1>
 
   <div class="entry">
-    <h2>Introduction</h2>
-
-<p>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</p>
+    <p>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</p>
 
 <p>The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.</p>
 
@@ -414,6 +412,16 @@ igorc@sl01:~$
 igorc@sl01:~$
 </code></pre></div>
 <p>in which case the server sends the RSA type (notice the different start and expire dates). In both cases we can see HTTP/2 connection being established.</p>
+
+<h2>External_resources:</h2>
+
+<ul>
+<li><a href="https://tomcat.apache.org/tomcat-9.0-doc/index.html">Tomcat9 documentation</a></li>
+<li><a href="https://www.youtube.com/channel/UCpqpJ0-G1lYfUBQ6_36Au_g">Tomcat Youtube channel</a></li>
+<li><a href="https://github.com/jfclere/h2_demos">Tomcat HTTP/2 demo app</a></li>
+<li><a href="https://github.com/http2/http2-spec/wiki/Implementations">HTTP/2 implementation tracking</a></li>
+<li><a href="https://github.com/fstab/h2c">H2C simple HTTP/2 command line test tool</a></li>
+</ul>
 
   </div>
 

@@ -16,8 +16,6 @@ external_resources:
 - '[H2C simple HTTP/2 command line test tool](https://github.com/fstab/h2c)'
 ---
 
-## Introduction
-
 Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.
 
 The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It's in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.
@@ -448,3 +446,11 @@ igorc@sl01:~$
 ```
 
 in which case the server sends the RSA type (notice the different start and expire dates). In both cases we can see HTTP/2 connection being established.
+
+## External_resources:
+* [Tomcat9 documentation](https://tomcat.apache.org/tomcat-9.0-doc/index.html)
+* [Tomcat Youtube channel](https://www.youtube.com/channel/UCpqpJ0-G1lYfUBQ6_36Au_g)
+* [Tomcat HTTP/2 demo app](https://github.com/jfclere/h2_demos)
+* [HTTP/2 implementation tracking](https://github.com/http2/http2-spec/wiki/Implementations)
+* [H2C simple HTTP/2 command line test tool](https://github.com/fstab/h2c)
+
