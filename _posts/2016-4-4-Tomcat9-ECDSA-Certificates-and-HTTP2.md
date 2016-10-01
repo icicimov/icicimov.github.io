@@ -8,7 +8,7 @@ description: 'Tomcat9 brings bunch of new features like support for HTTP/2 and m
 keywords: 'tomcat9,ecdsa,ecc,sni,'
 license: '[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0)'
 title: 'Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2'
-category: server
+category: Server
 tags: [tomcat, ssl, http2]
 external_resources:
 - '[Tomcat9 documentation](https://tomcat.apache.org/tomcat-9.0-doc/index.html)'
