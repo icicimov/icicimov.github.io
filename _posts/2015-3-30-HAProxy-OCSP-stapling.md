@@ -63,7 +63,12 @@ openssl ocsp -noverify -no_nonce -issuer ${DIR}/${ISSUER_NAME}.pem -cert ${DIR}/
 exit 0
 ```
 
-The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc.
+The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc. For the case of DigiCert the OCSP gets updated weekly so we can set a cronjob for the root user to update haproxy, for example:
+
+```
+# HAP OCSP
+0 5 * * * /usr/local/bin/ocsp_update.sh
+```
 
 To test the OCSP stapling:
 
