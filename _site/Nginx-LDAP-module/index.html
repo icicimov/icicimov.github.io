@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nginx LDAP module on Debian/Ubuntu – Igor Cicimov – DevOps at Encompass</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Nginx by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&#39;t have a dynamic (plug-able) module infrastructure like Apache for example.
+" />
+    <meta property="og:description" content="Nginx by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&#39;t have a dynamic (plug-able) module infrastructure like Apache for example.
+" />
+    
+    <meta name="author" content="Igor Cicimov" />
+
+    
+    <meta property="og:title" content="Nginx LDAP module on Debian/Ubuntu" />
+    <meta property="twitter:title" content="Nginx LDAP module on Debian/Ubuntu" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Igor Cicimov</a></h1>
+            <p class="site-description">DevOps at Encompass</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Nginx LDAP module on Debian/Ubuntu</h1>
+
+  <div class="entry">
+    <p><a href="www.nginx.com">Nginx</a> by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&#39;t have a dynamic (plug-able) module infrastructure like Apache for example.</p>
+
+<h2>Installation</h2>
+
+<p>First we need the OpenLDAP development headers so the module can build properly. On Ubuntu-12.04 (Precise) we run:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:~# aptitude install libldap2-dev
+</code></pre></div>
+<p>Then we switch to our Nginx source directory we have created in this article Centralized logs collection with Logstash and clone the Nginx ldap module inside the modules directory from its project site on GitHub:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:~# cd /tmp/nginx-1.6.0
+root@server:/tmp/nginx-1.6.0# cd debian/modules
+root@server:/tmp/nginx-1.6.0/debian/modules# git clone https://github.com/kvspb/nginx-auth-ldap.git
+Cloning into &#39;nginx-auth-ldap&#39;...
+remote: Counting objects: 196, done.
+remote: Total 196 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (196/196), 77.58 KiB | 102.00 KiB/s, done.
+Resolving deltas: 100% (101/101), done.
+Checking connectivity... done.
+</code></pre></div>
+<p>Then we edit the rules file and add the new module to the build command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0/debian/modules# cd ../../
+root@server:/tmp/nginx-1.6.0# vi debian/rules
+...
+naxsi_configure_flags := \
+                        $(common_configure_flags) \
+                        --without-mail_pop3_module \
+                        --without-mail_smtp_module \
+                        --without-mail_imap_module \
+                        --without-http_uwsgi_module \
+                        --without-http_scgi_module \
+                        --add-module=$(MODULESDIR)/naxsi/naxsi_src \
+                        --add-module=$(MODULESDIR)/nginx-cache-purge \
+                        --add-module=$(MODULESDIR)/nginx-upstream-fair \
+                        --add-module=$(MODULESDIR)/nginx-auth-ldap
+</code></pre></div>
+<p>Next we change the Nginx version in the changelog file:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0# vi debian/changelog
+</code></pre></div>
+<p>change the first line:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">nginx (1.6.0-1+precise0) precise; urgency=medium
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">nginx (1.6.0-1+precise0-ldap) precise; urgency=medium
+</code></pre></div>
+<p>and start the building process:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0# dpkg-buildpackage -uc -b
+</code></pre></div>
+<p>When finished we will see all the deb packages created in the directory one level above:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:~# ls -l /tmp/*.deb
+-rw-r--r-- 1 root root   19818 Aug 27 19:14 /tmp/nginx_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root   34086 Aug 27 19:14 /tmp/nginx-common_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root   31756 Aug 27 19:14 /tmp/nginx-doc_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root  643520 Aug 27 19:14 /tmp/nginx-extras_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 4839300 Aug 27 19:14 /tmp/nginx-extras-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  447082 Aug 27 19:14 /tmp/nginx-full_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 3152882 Aug 27 19:14 /tmp/nginx-full-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  363708 Aug 27 19:14 /tmp/nginx-light_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 2455638 Aug 27 19:14 /tmp/nginx-light-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  418852 Aug 27 19:14 /tmp/nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 2652770 Aug 27 19:14 /tmp/nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  308594 Aug 27 19:14 /tmp/nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
+</code></pre></div>
+<p>I install the nginx-naxsi packages only since that&#39;s the Nginx version I&#39;m are running:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0# dpkg -i nginx-common_1.6.0-1+precise0-ldap_all.deb nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
+</code></pre></div>
+<p>and restart Nginx process:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0# service nginx restart
+</code></pre></div>
+<p>After that we can check the Nginx version information to confirm it compiled with LDAP support:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/tmp/nginx-1.6.0# nginx -V
+nginx version: nginx/1.6.0
+TLS SNI support enabled
+configure arguments: --with-cc-opt=&#39;-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2&#39; --with-ld-opt=&#39;-Wl,-Bsymbolic-functions -Wl,-z,relro&#39; --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --without-mail_pop3_module --without-mail_smtp_module --without-mail_imap_module --without-http_uwsgi_module --without-http_scgi_module --add-module=/tmp/nginx-1.6.0/debian/modules/naxsi/naxsi_src --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-cache-purge --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-upstream-fair --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-auth-ldap
+</code></pre></div>
+<h2>Configuration</h2>
+
+<p>We add to Nginx config file <code>/etc/nginx/nginx.conf</code>:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">http {
+  ...
+  auth_ldap_cache_enabled on;
+  auth_ldap_cache_expiration_time 10000;
+  auth_ldap_cache_size 1000;
+
+  ldap_server ldap1 {
+    url ldap://ldap1.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
+    binddn &quot;cn=binduser,ou=Users,dc=mydomain,dc=com&quot;;
+    binddn_passwd bindpassword;
+    group_attribute memberUid;
+    group_attribute_is_dn on;
+    require group &quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&quot;;
+    require valid_user;
+  }
+
+  ldap_server ldap2 {
+    url ldap://ldap2.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
+    binddn &quot;cn=binduser,ou=Users,dc=mydomain,dc=com&quot;;
+    binddn_passwd bindpassword;
+    group_attribute memberUid;
+    group_attribute_is_dn on;
+    require group &quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&quot;;
+    require valid_user;
+  }
+  ...
+}
+</code></pre></div>
+<p>Then we use this in the virtual hosts or locations we want to protect like for example our server virtual host, in this case I have site <code>server</code> active so I put in the <code>/etc/nginx/sites-enabled/server</code> file:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">server {
+    listen              443 ssl;
+    server_name         server.mydomain.com www.server.mydomain.com;
+    root                /opt/server/webapp/content;
+...   
+    location / {
+        include  /etc/nginx/mysite.rules;
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_redirect off;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass   http://127.0.0.1:8080;
+        auth_ldap &quot;My server access&quot;;
+        auth_ldap_servers ldap1;
+        auth_ldap_servers ldap2;
+    }
+...
+}
+</code></pre></div>
+<p>The only drawback is that the module still doesn&#39;t support STARTTLS but supports SSL so in case we really need encrypted traffic (outside an internal LAN for example) we need to edit the config to use <code>ldaps</code> on port <code>636</code> (assuming our LDAP server has been configured with SSL support).</p>
+
+  </div>
+
+  <div class="date">
+    Written on September  2, 2014
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'http-icicimov-github-io';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+<a href="mailto:igorc@encompasscorporation.com"><i class="svg-icon email"></i></a>
+
+
+<a href="https://github.com/icicimov/jekyll-now"><i class="svg-icon github"></i></a>
+
+<a href="https://www.linkedin.com/in/igorcicimov"><i class="svg-icon linkedin"></i></a>
+
+
+<a href="https://www.twitter.com/icicimov"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

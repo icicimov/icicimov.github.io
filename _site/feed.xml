@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T21:47:38+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T22:24:44+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
 
 &lt;p&gt;The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&amp;#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.&lt;/p&gt;
 
@@ -601,4 +601,132 @@ https-in,ip-172-31-11-41,UP,100
 https-in,localhost,no check,1
 https-in,BACKEND,UP,200
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><summary>Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry></feed>
+&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><summary>Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry><entry><title>Nginx LDAP module on Debian/Ubuntu</title><link href="http://icicimov.github.io/Nginx-LDAP-module/" rel="alternate" type="text/html" title="Nginx LDAP module on Debian/Ubuntu" /><published>2014-09-02T00:00:00+10:00</published><updated>2014-09-02T00:00:00+10:00</updated><id>http://icicimov.github.io/Nginx-LDAP-module</id><content type="html" xml:base="http://icicimov.github.io/Nginx-LDAP-module/">&lt;p&gt;&lt;a href=&quot;www.nginx.com&quot;&gt;Nginx&lt;/a&gt; by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.&lt;/p&gt;
+
+&lt;h2&gt;Installation&lt;/h2&gt;
+
+&lt;p&gt;First we need the OpenLDAP development headers so the module can build properly. On Ubuntu-12.04 (Precise) we run:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# aptitude install libldap2-dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then we switch to our Nginx source directory we have created in this article Centralized logs collection with Logstash and clone the Nginx ldap module inside the modules directory from its project site on GitHub:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# cd /tmp/nginx-1.6.0
+root@server:/tmp/nginx-1.6.0# cd debian/modules
+root@server:/tmp/nginx-1.6.0/debian/modules# git clone https://github.com/kvspb/nginx-auth-ldap.git
+Cloning into &amp;#39;nginx-auth-ldap&amp;#39;...
+remote: Counting objects: 196, done.
+remote: Total 196 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (196/196), 77.58 KiB | 102.00 KiB/s, done.
+Resolving deltas: 100% (101/101), done.
+Checking connectivity... done.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then we edit the rules file and add the new module to the build command:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0/debian/modules# cd ../../
+root@server:/tmp/nginx-1.6.0# vi debian/rules
+...
+naxsi_configure_flags := \
+                        $(common_configure_flags) \
+                        --without-mail_pop3_module \
+                        --without-mail_smtp_module \
+                        --without-mail_imap_module \
+                        --without-http_uwsgi_module \
+                        --without-http_scgi_module \
+                        --add-module=$(MODULESDIR)/naxsi/naxsi_src \
+                        --add-module=$(MODULESDIR)/nginx-cache-purge \
+                        --add-module=$(MODULESDIR)/nginx-upstream-fair \
+                        --add-module=$(MODULESDIR)/nginx-auth-ldap
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Next we change the Nginx version in the changelog file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# vi debian/changelog
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;change the first line:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;nginx (1.6.0-1+precise0) precise; urgency=medium
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;to:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;nginx (1.6.0-1+precise0-ldap) precise; urgency=medium
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and start the building process:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg-buildpackage -uc -b
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When finished we will see all the deb packages created in the directory one level above:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# ls -l /tmp/*.deb
+-rw-r--r-- 1 root root   19818 Aug 27 19:14 /tmp/nginx_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root   34086 Aug 27 19:14 /tmp/nginx-common_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root   31756 Aug 27 19:14 /tmp/nginx-doc_1.6.0-1+precise0-ldap_all.deb
+-rw-r--r-- 1 root root  643520 Aug 27 19:14 /tmp/nginx-extras_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 4839300 Aug 27 19:14 /tmp/nginx-extras-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  447082 Aug 27 19:14 /tmp/nginx-full_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 3152882 Aug 27 19:14 /tmp/nginx-full-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  363708 Aug 27 19:14 /tmp/nginx-light_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 2455638 Aug 27 19:14 /tmp/nginx-light-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  418852 Aug 27 19:14 /tmp/nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root 2652770 Aug 27 19:14 /tmp/nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb
+-rw-r--r-- 1 root root  308594 Aug 27 19:14 /tmp/nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I install the nginx-naxsi packages only since that&amp;#39;s the Nginx version I&amp;#39;m are running:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg -i nginx-common_1.6.0-1+precise0-ldap_all.deb nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and restart Nginx process:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# service nginx restart
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After that we can check the Nginx version information to confirm it compiled with LDAP support:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# nginx -V
+nginx version: nginx/1.6.0
+TLS SNI support enabled
+configure arguments: --with-cc-opt=&amp;#39;-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2&amp;#39; --with-ld-opt=&amp;#39;-Wl,-Bsymbolic-functions -Wl,-z,relro&amp;#39; --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --without-mail_pop3_module --without-mail_smtp_module --without-mail_imap_module --without-http_uwsgi_module --without-http_scgi_module --add-module=/tmp/nginx-1.6.0/debian/modules/naxsi/naxsi_src --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-cache-purge --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-upstream-fair --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-auth-ldap
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Configuration&lt;/h2&gt;
+
+&lt;p&gt;We add to Nginx config file &lt;code&gt;/etc/nginx/nginx.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;http {
+  ...
+  auth_ldap_cache_enabled on;
+  auth_ldap_cache_expiration_time 10000;
+  auth_ldap_cache_size 1000;
+
+  ldap_server ldap1 {
+    url ldap://ldap1.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
+    binddn &amp;quot;cn=binduser,ou=Users,dc=mydomain,dc=com&amp;quot;;
+    binddn_passwd bindpassword;
+    group_attribute memberUid;
+    group_attribute_is_dn on;
+    require group &amp;quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&amp;quot;;
+    require valid_user;
+  }
+
+  ldap_server ldap2 {
+    url ldap://ldap2.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
+    binddn &amp;quot;cn=binduser,ou=Users,dc=mydomain,dc=com&amp;quot;;
+    binddn_passwd bindpassword;
+    group_attribute memberUid;
+    group_attribute_is_dn on;
+    require group &amp;quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&amp;quot;;
+    require valid_user;
+  }
+  ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then we use this in the virtual hosts or locations we want to protect like for example our server virtual host, in this case I have site &lt;code&gt;server&lt;/code&gt; active so I put in the &lt;code&gt;/etc/nginx/sites-enabled/server&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;server {
+    listen              443 ssl;
+    server_name         server.mydomain.com www.server.mydomain.com;
+    root                /opt/server/webapp/content;
+...   
+    location / {
+        include  /etc/nginx/mysite.rules;
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_redirect off;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass   http://127.0.0.1:8080;
+        auth_ldap &amp;quot;My server access&amp;quot;;
+        auth_ldap_servers ldap1;
+        auth_ldap_servers ldap2;
+    }
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The only drawback is that the module still doesn&amp;#39;t support STARTTLS but supports SSL so in case we really need encrypted traffic (outside an internal LAN for example) we need to edit the config to use &lt;code&gt;ldaps&lt;/code&gt; on port &lt;code&gt;636&lt;/code&gt; (assuming our LDAP server has been configured with SSL support).&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><summary>Nginx by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.</summary></entry></feed>
