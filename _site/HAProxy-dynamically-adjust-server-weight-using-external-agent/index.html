@@ -9,9 +9,9 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
 
     
-    <meta name="description" content="Introduction
+    <meta name="description" content="Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
 " />
-    <meta property="og:description" content="Introduction
+    <meta property="og:description" content="Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
 " />
     
     <meta name="author" content="Igor Cicimov" />
@@ -55,9 +55,7 @@
   <h1>HAProxy dynamically adjust server weight using external agent</h1>
 
   <div class="entry">
-    <h2>Introduction</h2>
-
-<p>Trying to utilize HAProxy-1.5/1.6 <code>agent-check</code> feature, see <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check">HAProxy documentation</a>, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</p>
+    <p>Trying to utilize HAProxy-1.5/1.6 <code>agent-check</code> feature, see <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check">HAProxy documentation</a>, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</p>
 
 <p>This will run as xinetd service on the Tomcats, for example made available to HAP on port 9707 (some randomly chosen free port).</p>
 

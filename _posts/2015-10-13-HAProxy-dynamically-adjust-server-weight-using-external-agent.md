@@ -3,8 +3,6 @@ layout: post
 title: HAProxy dynamically adjust server weight using external agent 
 ---
 
-## Introduction
-
 Trying to utilize HAProxy-1.5/1.6 `agent-check` feature, see [HAProxy documentation](http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check), I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
 
 This will run as xinetd service on the Tomcats, for example made available to HAP on port 9707 (some randomly chosen free port).
