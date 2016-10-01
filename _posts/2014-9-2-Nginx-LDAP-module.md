@@ -4,7 +4,7 @@ comments: true
 author:
   name: Igor Cicimov
   email: igorc@encompasscorporation.com
-description: 'Compile LDAP module for Nginx'
+description: 'Compile LDAP module for Nginx in Debian/Ubuntu'
 keywords: 'nginx,ldap'
 license: '[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0)'
 title: 'Nginx LDAP module on Debian/Ubuntu'

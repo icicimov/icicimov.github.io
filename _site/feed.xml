@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T22:24:44+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-01T22:45:41+10:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
 
 &lt;p&gt;The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&amp;#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.&lt;/p&gt;
 
@@ -601,7 +601,105 @@ https-in,ip-172-31-11-41,UP,100
 https-in,localhost,no check,1
 https-in,BACKEND,UP,200
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><summary>Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry><entry><title>Nginx LDAP module on Debian/Ubuntu</title><link href="http://icicimov.github.io/Nginx-LDAP-module/" rel="alternate" type="text/html" title="Nginx LDAP module on Debian/Ubuntu" /><published>2014-09-02T00:00:00+10:00</published><updated>2014-09-02T00:00:00+10:00</updated><id>http://icicimov.github.io/Nginx-LDAP-module</id><content type="html" xml:base="http://icicimov.github.io/Nginx-LDAP-module/">&lt;p&gt;&lt;a href=&quot;www.nginx.com&quot;&gt;Nginx&lt;/a&gt; by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.&lt;/p&gt;
+&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><summary>Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry><entry><title>HAProxy OCSP stapling</title><link href="http://icicimov.github.io/HAProxy-OCSP-stapling/" rel="alternate" type="text/html" title="HAProxy OCSP stapling" /><published>2015-03-30T00:00:00+11:00</published><updated>2015-03-30T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-OCSP-stapling</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-OCSP-stapling/">&lt;p&gt;The &lt;strong&gt;Online Certificate Status Protocol (OCSP)&lt;/strong&gt; is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.&lt;/p&gt;
+
+&lt;p&gt;OCSP stapling, formally known as the TLS Certificate Status Request extension, is an alternative approach to the OCSP for checking the revocation status of X.509 digital certificates. It allows the presenter (the server) of a certificate to bear the resource cost involved in providing OCSP responses by appending (&amp;quot;stapling&amp;quot;) a time-stamped OCSP response signed by the CA to the initial TLS Handshake, eliminating the need for clients to contact the CA.&lt;/p&gt;
+
+&lt;h2&gt;Setting HAP for OCSP stapling&lt;/h2&gt;
+
+&lt;p&gt;HAProxy implements OCSP stapling since version 1.5.6. By attaching the CA signed OCSP response to the initial SSL/TLS hand shake, the servers speed up the process of the establishing the SSL connection since the client does not need to contact the CRL or the OCSP responder of the CA does saving significant time. In our case, we need to contact the OCSP responder of our CA (Digicert), save the response in a file and tell HAP to use that file for stapling. The process can be described in two steps:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Obtain the signed response from the OCSP authority&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/etc/haproxy# openssl ocsp -issuer DigiCertSecureServerCA.pem -cert star_mydomain_com.crt -url http://ocsp.digicert.com -header Host ocsp.digicert.com -no_nonce -noverify -respout star_mydomain_com.crt.ocsp
+star_mydomain_com.crt: good
+    This Update: Mar 29 12:05:00 2015 GMT
+    Next Update: Apr  5 12:20:00 2015 GMT
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Dynamically update HAP with this information&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/etc/haproxy# echo &amp;quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 /etc/haproxy/star_mydomain_com.crt.ocsp)&amp;quot; | socat stdio unix-connect:/run/haproxy/admin.sock
+OCSP Response updated!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We can automate the process with running the following script &lt;code&gt;/usr/local/bin/ocsp_update.sh&lt;/code&gt; as cronjob on daily basis:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Certificates path and names&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;/etc/haproxy&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;star_mydomain_com.crt&amp;quot;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Get the issuer URI, download it&amp;#39;s certificate and convert into PEM format&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;openssl x509 -in &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; -text -noout &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep &lt;span class=&quot;s1&quot;&gt;&amp;#39;CA Issuers&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d: -f2,3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;##*/&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r fname&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;fname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done)&lt;/span&gt;
+wget -q -O- &lt;span class=&quot;nv&quot;&gt;$ISSUER_URI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; openssl x509 -inform DER -outform PEM -out &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.pem
+
+&lt;span class=&quot;c&quot;&gt;# Get the OCSP URL from the certificate&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ocsp_url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;openssl x509 -noout -ocsp_uri -in &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;})&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Extract the hostname from the OCSP URL&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ocsp_host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ocsp_url&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d/ -f3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Create/update the ocsp response file and update HAProxy&lt;/span&gt;
+openssl ocsp -noverify -no_nonce -issuer &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.pem -cert &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; -url &lt;span class=&quot;nv&quot;&gt;$ocsp_url&lt;/span&gt; -header Host &lt;span class=&quot;nv&quot;&gt;$ocsp_host&lt;/span&gt; -respout &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp
+&lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$?&lt;/span&gt; -eq &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;pidof haproxy&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; -s &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 ${DIR}/${CERT}.ocsp)&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; socat stdio unix-connect:/run/haproxy/admin.sock
+
+&lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc.&lt;/p&gt;
+
+&lt;p&gt;To test the OCSP stapling:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@igor-laptop:~/Downloads$ echo quit | openssl s_client -connect server.mydomain.com:443 -status
+CONNECTED(00000003)
+depth=2 C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
+verify error:num=19:self signed certificate in certificate chain
+verify return:0
+OCSP response:
+======================================
+OCSP Response Data:
+    OCSP Response Status: successful (0x0)
+    Response Type: Basic OCSP Response
+    Version: 1 (0x0)
+    Responder Id: 9071DB37EB73C8EFDCD51E12B634BA2B5AA0A692
+    Produced At: Mar 29 12:05:00 2015 GMT
+    Responses:
+    Certificate ID:
+      Hash Algorithm: sha1
+      Issuer Name Hash: 20A6948B01BEE825A43A455576661F55C1920633
+      Issuer Key Hash: 9071DB37EB73C8EFDCD51E12B634BA2B5AA0A692
+      Serial Number: 064E51056C1688FFD0A9172758797C49
+    Cert Status: good
+    This Update: Mar 29 12:05:00 2015 GMT
+    Next Update: Apr  5 12:20:00 2015 GMT
+
+    Signature Algorithm: sha1WithRSAEncryption
+         3c:9e:39:45:51:c5:55:61:78:26:cc:3e:3d:78:44:b7:37:53:
+         f8:09:25:a1:80:8a:2f:39:ca:db:1e:94:d5:69:47:f6:c6:cc:
+         c2:74:7b:fb:0c:75:67:49:a2:5d:17:69:68:5b:43:fa:d7:27:
+         53:76:24:13:e9:7f:7e:5b:da:25:9e:a7:ee:10:56:33:2e:f0:
+         d6:1b:13:a7:78:fd:96:23:51:5f:5b:9e:33:55:d1:73:c7:6a:
+         cd:50:30:8f:40:8c:bc:0e:5f:e7:14:04:fc:cd:88:d1:5f:e6:
+         34:2a:41:22:92:29:c6:cc:b8:bb:26:1d:ef:4b:c1:17:35:be:
+         c9:f4:19:11:d6:b7:70:18:72:19:b8:ad:b3:f6:be:c6:95:cd:
+         97:80:04:ce:12:2d:37:00:db:a3:f0:25:4e:e1:38:f4:90:29:
+         2d:e5:4e:6c:e6:a6:d8:02:eb:be:59:f3:55:7c:cb:73:73:2c:
+         f9:9a:42:3f:43:7e:ee:6a:52:2f:46:3e:72:ee:ee:78:10:97:
+         fc:97:c3:87:f6:9d:15:4e:3b:13:cb:37:db:0f:d8:1f:58:6c:
+         c3:1a:45:94:c5:d8:d1:3f:dd:f4:82:c3:e2:a0:51:95:7f:37:
+         1b:d3:28:af:bc:23:05:13:53:fe:dc:42:ae:7b:92:ec:2d:e7:
+         0b:4a:56:aa
+======================================
+---
+Certificate chain
+ 0 s:/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Pty Ltd/CN=*.mydomain.com
+   i:/C=US/O=DigiCert Inc/CN=DigiCert Secure Server CA
+ 1 s:/C=US/O=DigiCert Inc/CN=DigiCert Secure Server CA
+   i:/C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert Global Root CA
+ 2 s:/C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert Global Root CA
+   i:/C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert Global Root CA
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can see the server including the OCSP response in the TLS handshake.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><summary>The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</summary></entry><entry><title>Nginx LDAP module on Debian/Ubuntu</title><link href="http://icicimov.github.io/Nginx-LDAP-module/" rel="alternate" type="text/html" title="Nginx LDAP module on Debian/Ubuntu" /><published>2014-09-02T00:00:00+10:00</published><updated>2014-09-02T00:00:00+10:00</updated><id>http://icicimov.github.io/Nginx-LDAP-module</id><content type="html" xml:base="http://icicimov.github.io/Nginx-LDAP-module/">&lt;p&gt;&lt;a href=&quot;www.nginx.com&quot;&gt;Nginx&lt;/a&gt; by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.&lt;/p&gt;
 
 &lt;h2&gt;Installation&lt;/h2&gt;
 
