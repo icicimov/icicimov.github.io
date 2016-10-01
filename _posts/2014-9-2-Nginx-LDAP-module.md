@@ -8,6 +8,8 @@ description: 'Compile LDAP module for Nginx in Debian/Ubuntu'
 keywords: 'nginx,ldap'
 license: '[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0)'
 title: 'Nginx LDAP module on Debian/Ubuntu'
+category: server
+tags: [nginx, ldap]
 ---
 
 [Nginx](www.nginx.com) by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn't have a dynamic (plug-able) module infrastructure like Apache for example.

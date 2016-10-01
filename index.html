@@ -3,7 +3,22 @@ layout: default
 ---
 
 <div class="posts">
-  {% for post in site.posts %}
+  {% for post in paginator.posts %} 
+
+    <nav id="pagination">
+        {% if paginator.previous_page %}
+          {% if paginator.previous_page == 1 %}
+            <a href="{{ site.baseurl }}/">&laquo;</a>
+          {% else %}
+            <a href="{{ site.baseurl }}/page{{ paginator.previous_page }}/">&laquo;</a>
+          {% endif %}
+        {% endif %}
+
+        {% if paginator.next_page %} 
+          <a href="{{ site.baseurl }}/page{{ paginator.next_page }}/">&raquo;</a>
+        {% endif %} 
+    </nav>
+
     <article class="post">
 
       <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>

@@ -51,64 +51,47 @@
 
     <nav id="pagination">
         
+          
+            <a href="/">&laquo;</a>
+          
+        
 
-         
-          <a href="/page2/">&raquo;</a>
          
     </nav>
 
     <article class="post">
 
-      <h1><a href="/Tomcat9-ECDSA-Certificates-and-HTTP2/">Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</a></h1>
+      <h1><a href="/HAProxy-OCSP-stapling/">HAProxy OCSP stapling</a></h1>
 
       <div class="entry">
-        <p>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</p>
+        <p>The <strong>Online Certificate Status Protocol (OCSP)</strong> is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &#39;good&#39;, &#39;revoked&#39;, or &#39;unknown&#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</p>
 
       </div>
 
-      <a href="/Tomcat9-ECDSA-Certificates-and-HTTP2/" class="read-more">Read More</a>
+      <a href="/HAProxy-OCSP-stapling/" class="read-more">Read More</a>
     </article>
    
 
     <nav id="pagination">
         
-
-         
-          <a href="/page2/">&raquo;</a>
-         
-    </nav>
-
-    <article class="post">
-
-      <h1><a href="/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</a></h1>
-
-      <div class="entry">
-        <p>During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the <a href="http://activemq.apache.org/shared-file-system-master-slave.html">Apache project site</a>:</p>
-
-      </div>
-
-      <a href="/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" class="read-more">Read More</a>
-    </article>
-   
-
-    <nav id="pagination">
+          
+            <a href="/">&laquo;</a>
+          
         
 
          
-          <a href="/page2/">&raquo;</a>
-         
     </nav>
 
     <article class="post">
 
-      <h1><a href="/HAProxy-dynamically-adjust-server-weight-using-external-agent/">HAProxy dynamically adjust server weight using external agent</a></h1>
+      <h1><a href="/Nginx-LDAP-module/">Nginx LDAP module on Debian/Ubuntu</a></h1>
 
       <div class="entry">
-        <p>Trying to utilize HAProxy-1.5/1.6 <code>agent-check</code> feature, see <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check">HAProxy documentation</a>, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</p>
+        <p><a href="www.nginx.com">Nginx</a> by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&#39;t have a dynamic (plug-able) module infrastructure like Apache for example.</p>
 
       </div>
 
-      <a href="/HAProxy-dynamically-adjust-server-weight-using-external-agent/" class="read-more">Read More</a>
+      <a href="/Nginx-LDAP-module/" class="read-more">Read More</a>
     </article>
   
 </div>
