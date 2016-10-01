@@ -2,6 +2,8 @@
 layout: post
 comments: true
 title: ActiveMQ Master/Slave KahaDB on OCFS2 shared file system
+category: server
+tags: [activemq, ocfs2]
 ---
 
 During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the [Apache project site](http://activemq.apache.org/shared-file-system-master-slave.html):

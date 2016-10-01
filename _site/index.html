@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <title>Igor Cicimov – DevOps at Encompass</title>
 
         <meta charset="utf-8" />
@@ -46,7 +47,13 @@
     </div>
 
     <div id="main" role="main" class="container">
-      <div class="posts">
+      <div style="display:inline-block;margin-left:.5em;">
+    Browse by <a href="/category/">Category</a> or <a href="/tag/">Tag</a>
+</div>
+
+<br/><br/>
+
+<div class="posts">
    
 
     <nav id="pagination">
@@ -60,6 +67,19 @@
     <article class="post">
 
       <h1><a href="/Tomcat9-ECDSA-Certificates-and-HTTP2/">Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</a></h1>
+        <span class="post-date">
+            04 Apr 2016
+            
+            |
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#tomcat">tomcat</a>
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#ssl">ssl</a>
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#http2">http2</a>
+            
+            
+	</span>
 
       <div class="entry">
         <p>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</p>
@@ -81,6 +101,17 @@
     <article class="post">
 
       <h1><a href="/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</a></h1>
+        <span class="post-date">
+            18 Mar 2016
+            
+            |
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#activemq">activemq</a>
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#ocfs2">ocfs2</a>
+            
+            
+	</span>
 
       <div class="entry">
         <p>During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the <a href="http://activemq.apache.org/shared-file-system-master-slave.html">Apache project site</a>:</p>
@@ -102,6 +133,15 @@
     <article class="post">
 
       <h1><a href="/HAProxy-dynamically-adjust-server-weight-using-external-agent/">HAProxy dynamically adjust server weight using external agent</a></h1>
+        <span class="post-date">
+            13 Oct 2015
+            
+            |
+            
+            <a class="post-tag codinfox-tag-mark" href="/tags/#haproxy">haproxy</a>
+            
+            
+	</span>
 
       <div class="entry">
         <p>Trying to utilize HAProxy-1.5/1.6 <code>agent-check</code> feature, see <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check">HAProxy documentation</a>, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</p>
@@ -111,6 +151,15 @@
       <a href="/HAProxy-dynamically-adjust-server-weight-using-external-agent/" class="read-more">Read More</a>
     </article>
   
+</div>
+
+<div class="pagination">
+    
+    <a class="pagination-item older" href="/page2">Older</a>
+    
+    
+    <span class="pagination-item newer">Newer</span>
+    
 </div>
 
     </div>

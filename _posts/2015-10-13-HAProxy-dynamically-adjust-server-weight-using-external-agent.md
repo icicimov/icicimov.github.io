@@ -1,6 +1,8 @@
 ---
 layout: post
-title: HAProxy dynamically adjust server weight using external agent 
+title: HAProxy dynamically adjust server weight using external agent
+category: server
+tags: [haproxy]
 ---
 
 Trying to utilize HAProxy-1.5/1.6 `agent-check` feature, see [HAProxy documentation](http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check), I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
