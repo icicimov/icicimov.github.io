@@ -30,8 +30,8 @@
 <meta property="og:title" content="Igor Cicimov" />
 <meta name="description" content="DevOps at Encompass" />
 <meta property="og:description" content="DevOps at Encompass" />
-<link rel="canonical" href="http://icicimov.github.io/.bkp" />
-<meta property="og:url" content="http://icicimov.github.io/.bkp" />
+<link rel="canonical" href="https://icicimov.github.io/.bkp" />
+<meta property="og:url" content="https://icicimov.github.io/.bkp" />
 <meta property="og:site_name" content="Igor Cicimov" />
 <script type="application/ld+json">
   {
@@ -39,7 +39,7 @@
     "@type": "WebPage",
     "headline": "Igor Cicimov",
     "description": "DevOps at Encompass",
-    "url": "http://icicimov.github.io/.bkp"
+    "url": "https://icicimov.github.io/.bkp"
   }
 </script>
 <!-- End Jekyll SEO tag -->

@@ -11,6 +11,8 @@ description: DevOps at Encompass
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png
 
+timezone: Australia/Sydney
+
 #
 # Flags below are optional
 #
@@ -41,7 +43,7 @@ google_analytics:
 
 # Your website URL (e.g. http://barryclark.github.io or http://www.barryclark.co)
 # Used for Sitemap.xml and your RSS feed
-url: http://icicimov.github.io
+url: https://icicimov.github.io
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
@@ -53,9 +55,14 @@ baseurl: ""
 # !! You don't need to change any of the configuration flags below !!
 #
 
-markdown: redcarpet
 #highlighter: pygments
 #markdown: kramdown
+markdown: redcarpet
+redcarpet:
+  syntax_highlighter: rouge
+  extensions:
+   - with_toc_data
+   - tables
 highlighter: rouge
 permalink: /:title/
 
@@ -84,7 +91,11 @@ jekyll-archives:
     - year
     - month
     - tags
-  layout: 'archive'
+  layouts:
+    year: year-archive
+    month: month-archive
+    #day: day-archive
+    #tag: tag-archive-layout
   permalinks:
     year: '/:year/'
     month: '/:year/:month/'

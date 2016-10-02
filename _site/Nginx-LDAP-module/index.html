@@ -35,8 +35,8 @@
 <meta property="og:title" content="Nginx LDAP module on Debian/Ubuntu">
 <meta name="description" content="Compile LDAP module for Nginx in Debian/Ubuntu">
 <meta property="og:description" content="Compile LDAP module for Nginx in Debian/Ubuntu">
-<link rel="canonical" href="http://icicimov.github.io/Nginx-LDAP-module/">
-<meta property="og:url" content="http://icicimov.github.io/Nginx-LDAP-module/">
+<link rel="canonical" href="https://icicimov.github.io/Nginx-LDAP-module/">
+<meta property="og:url" content="https://icicimov.github.io/Nginx-LDAP-module/">
 <meta property="og:site_name" content="Igor Cicimov">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2014-09-02T00:00:00+10:00">
@@ -47,7 +47,7 @@
     "headline": "Nginx LDAP module on Debian/Ubuntu",
     "datePublished": "2014-09-02T00:00:00+10:00",
     "description": "Compile LDAP module for Nginx in Debian/Ubuntu",
-    "url": "http://icicimov.github.io/Nginx-LDAP-module/"
+    "url": "https://icicimov.github.io/Nginx-LDAP-module/"
   }
 </script>
 <!-- End Jekyll SEO tag -->
@@ -79,7 +79,7 @@
   <div class="entry">
     <p><a href="www.nginx.com">Nginx</a> by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn't have a dynamic (plug-able) module infrastructure like Apache for example.</p>
 
-<h2>Installation</h2>
+<h2 id="installation">Installation</h2>
 
 <p>First we need the OpenLDAP development headers so the module can build properly. On Ubuntu-12.04 (Precise) we run:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">root@server:~# aptitude install libldap2-dev
@@ -150,7 +150,7 @@ nginx version: nginx/1.6.0
 TLS SNI support enabled
 configure arguments: --with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2' --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --without-mail_pop3_module --without-mail_smtp_module --without-mail_imap_module --without-http_uwsgi_module --without-http_scgi_module --add-module=/tmp/nginx-1.6.0/debian/modules/naxsi/naxsi_src --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-cache-purge --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-upstream-fair --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-auth-ldap
 </code></pre></div>
-<h2>Configuration</h2>
+<h2 id="configuration">Configuration</h2>
 
 <p>We add to Nginx config file <code>/etc/nginx/nginx.conf</code>:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">http {

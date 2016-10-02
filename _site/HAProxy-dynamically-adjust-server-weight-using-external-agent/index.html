@@ -35,8 +35,8 @@
 <meta property="og:title" content="HAProxy dynamically adjust server weight using external agent">
 <meta name="description" content="Dynamically adjust server weight using external agent in HAProxy">
 <meta property="og:description" content="Dynamically adjust server weight using external agent in HAProxy">
-<link rel="canonical" href="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
-<meta property="og:url" content="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
+<link rel="canonical" href="https://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
+<meta property="og:url" content="https://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
 <meta property="og:site_name" content="Igor Cicimov">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2015-10-13T00:00:00+11:00">
@@ -47,7 +47,7 @@
     "headline": "HAProxy dynamically adjust server weight using external agent",
     "datePublished": "2015-10-13T00:00:00+11:00",
     "description": "Dynamically adjust server weight using external agent in HAProxy",
-    "url": "http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/"
+    "url": "https://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/"
   }
 </script>
 <!-- End Jekyll SEO tag -->
@@ -85,9 +85,9 @@
 
 <p>This additional, lets call it secondary, heath check will work in conjunction with the already existing one, which only checks if the service is up or down, and provide flexibility in terms of backend load.</p>
 
-<h2>Setup</h2>
+<h2 id="setup">Setup</h2>
 
-<h3>On the backends (Tomcat app servers)</h3>
+<h3 id="on-the-backends-tomcat-app-servers">On the backends (Tomcat app servers)</h3>
 
 <p>Create agent-check script <code>/usr/local/bin/haproxy-agent-check</code>:</p>
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/bin/bash</span>
@@ -148,7 +148,7 @@ Connection closed by foreign host.
 </code></pre></div>
 <p>All looks good so we can setup the HAP's now.</p>
 
-<h1>On the HAProxy LB's</h1>
+<h1 id="on-the-haproxy-lb-39-s">On the HAProxy LB's</h1>
 
 <p>Open the TCP port 9707 in the APP servers firewall and Test the agent-check connectivity from HAP serers to the app servers:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">root@lb1:~# telnet ip-172-31-17-41 9707

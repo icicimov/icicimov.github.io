@@ -35,8 +35,8 @@
 <meta property="og:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2">
 <meta name="description" content="Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.">
 <meta property="og:description" content="Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.">
-<link rel="canonical" href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
-<meta property="og:url" content="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
+<link rel="canonical" href="https://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
+<meta property="og:url" content="https://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
 <meta property="og:site_name" content="Igor Cicimov">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2016-04-04T00:00:00+10:00">
@@ -47,7 +47,7 @@
     "headline": "Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2",
     "datePublished": "2016-04-04T00:00:00+10:00",
     "description": "Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.",
-    "url": "http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/"
+    "url": "https://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/"
   }
 </script>
 <!-- End Jekyll SEO tag -->
@@ -83,11 +83,11 @@
 
 <p>Nice things to have so I setup a test Tomcat9 server on Ubunut 14.04.</p>
 
-<h2>Setup</h2>
+<h2 id="setup">Setup</h2>
 
 <p>We start by installing and setup of the prerequisites mentioned in the Introduction.</p>
 
-<h3>OpenSSL</h3>
+<h3 id="openssl">OpenSSL</h3>
 
 <p>Standard compile procedure, we start by installing some needed packages:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
@@ -119,16 +119,16 @@ drwxr-xr-x 3 root root 4096 Apr  2 19:18 include
 drwxr-xr-x 4 root root 4096 Apr  2 19:18 lib
 drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
 </code></pre></div>
-<h3>Java8</h3>
+<h3 id="java8">Java8</h3>
 
 <p>One liner installation:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;&amp; echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list &amp;&amp; echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list &amp;&amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;&amp; sudo aptitude update &amp;&amp; sudo aptitude install -y oracle-java8-installer &amp;&amp; sudo aptitude install -y oracle-java8-set-default
 </code></pre></div>
 <p>This will add the needed Ubuntu ppa, install the latest Oracle 1.8 JDK and set it as default Java environment.</p>
 
-<h3>Tomcat9</h3>
+<h3 id="tomcat9">Tomcat9</h3>
 
-<h4>Installation</h4>
+<h4 id="installation">Installation</h4>
 
 <p>Get and unpack the latest Tomcat9 release, alfa version v9.0.0.M4 at the moment of this writing, and setup tomcat user:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
@@ -140,7 +140,7 @@ igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/logs /var/log/tomcat9
 igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/work /var/cache/tomcat9
 igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/conf /etc/tomcat9
 </code></pre></div>
-<h4>TC-Native</h4>
+<h4 id="tc-native">TC-Native</h4>
 
 <p>We install the needed packages first:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
@@ -166,7 +166,7 @@ libz.so.1 =&gt; /lib/x86_64-linux-gnu/libz.so.1 (0x00007f67cf620000)
 libuuid.so.1 =&gt; /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007f67cf41b000)
 /lib64/ld-linux-x86-64.so.2 (0x00007f67d0b3e000)
 </code></pre></div>
-<h4>Config and SSL setup</h4>
+<h4 id="config-and-ssl-setup">Config and SSL setup</h4>
 
 <p>I wanted to test the ECDSA certificate type and multi-certificate support in tomcat9. First create ECC cert and install it so tomcat can find it:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj '/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com'
@@ -219,9 +219,9 @@ Tomcat started.
 </code></pre></div>
 <p>We can see the APR connector, the correct OpenSSL version and the h2 protocol available via ALPN (Application-Layer Protocol Negotiation).</p>
 
-<h2>Testing</h2>
+<h2 id="testing">Testing</h2>
 
-<h3>CuRL</h3>
+<h3 id="curl">CuRL</h3>
 
 <p>To test the server I used the trusted curl. It came up it was little bit painful to set it up due to lot of prerequisites but since I've done it I might show it here as well. There are some other HTTP/2 testing tools available that you can use in case you have domain name registered with proper DNS resolution setup.</p>
 
@@ -436,7 +436,7 @@ igorc@sl01:~$
 </code></pre></div>
 <p>in which case the server sends the RSA type (notice the different start and expire dates). In both cases we can see HTTP/2 connection being established.</p>
 
-<h2>External_resources:</h2>
+<h2 id="external_resources">External_resources:</h2>
 
 <ul>
 <li><a href="https://tomcat.apache.org/tomcat-9.0-doc/index.html">Tomcat9 documentation</a></li>
