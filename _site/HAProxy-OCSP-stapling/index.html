@@ -4,39 +4,60 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <title>HAProxy OCSP stapling – Igor Cicimov – DevOps at Encompass</title>
 
-        <meta charset="utf-8" />
-    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+        <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     
-    <meta name="description" content="The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &#39;good&#39;, &#39;revoked&#39;, or &#39;unknown&#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.
-" />
-    <meta property="og:description" content="The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &#39;good&#39;, &#39;revoked&#39;, or &#39;unknown&#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.
-" />
+    <meta name="description" content="The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server's CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is 'good', 'revoked', or 'unknown'. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.
+">
+    <meta property="og:description" content="The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server's CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is 'good', 'revoked', or 'unknown'. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.
+">
     
-    <meta name="author" content="Igor Cicimov" />
+    <meta name="author" content="Igor Cicimov">
 
     
-    <meta property="og:title" content="HAProxy OCSP stapling" />
-    <meta property="twitter:title" content="HAProxy OCSP stapling" />
+    <meta property="og:title" content="HAProxy OCSP stapling">
+    <meta property="twitter:title" content="HAProxy OCSP stapling">
     
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml">
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.0.0 -->
+<title>HAProxy OCSP stapling - Igor Cicimov</title>
+<meta property="og:title" content="HAProxy OCSP stapling">
+<meta name="description" content="Introduction to OCSP and OCSP stapling and HAProxy OCSP stapling usage">
+<meta property="og:description" content="Introduction to OCSP and OCSP stapling and HAProxy OCSP stapling usage">
+<link rel="canonical" href="http://icicimov.github.io/HAProxy-OCSP-stapling/">
+<meta property="og:url" content="http://icicimov.github.io/HAProxy-OCSP-stapling/">
+<meta property="og:site_name" content="Igor Cicimov">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2015-03-30T00:00:00+11:00">
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "HAProxy OCSP stapling",
+    "datePublished": "2015-03-30T00:00:00+11:00",
+    "description": "Introduction to OCSP and OCSP stapling and HAProxy OCSP stapling usage",
+    "url": "http://icicimov.github.io/HAProxy-OCSP-stapling/"
+  }
+</script>
+<!-- End Jekyll SEO tag -->
   </head>
 
   <body>
     <div class="wrapper-masthead">
       <div class="container">
         <header class="masthead clearfix">
-          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png"></a>
 
           <div class="site-info">
             <h1 class="site-name"><a href="/">Igor Cicimov</a></h1>
@@ -56,55 +77,61 @@
   <h1>HAProxy OCSP stapling</h1>
 
   <div class="entry">
-    <p>The <strong>Online Certificate Status Protocol (OCSP)</strong> is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &#39;good&#39;, &#39;revoked&#39;, or &#39;unknown&#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</p>
+    <p>The <strong>Online Certificate Status Protocol (OCSP)</strong> is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server's CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is 'good', 'revoked', or 'unknown'. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</p>
 
-<p>OCSP stapling, formally known as the TLS Certificate Status Request extension, is an alternative approach to the OCSP for checking the revocation status of X.509 digital certificates. It allows the presenter (the server) of a certificate to bear the resource cost involved in providing OCSP responses by appending (&quot;stapling&quot;) a time-stamped OCSP response signed by the CA to the initial TLS Handshake, eliminating the need for clients to contact the CA.</p>
+<p>OCSP stapling, formally known as the TLS Certificate Status Request extension, is an alternative approach to the OCSP for checking the revocation status of X.509 digital certificates. It allows the presenter (the server) of a certificate to bear the resource cost involved in providing OCSP responses by appending ("stapling") a time-stamped OCSP response signed by the CA to the initial TLS Handshake, eliminating the need for clients to contact the CA.</p>
 
 <h2>Setting HAP for OCSP stapling</h2>
 
 <p>HAProxy implements OCSP stapling since version 1.5.6. By attaching the CA signed OCSP response to the initial SSL/TLS hand shake, the servers speed up the process of the establishing the SSL connection since the client does not need to contact the CRL or the OCSP responder of the CA does saving significant time. In our case, we need to contact the OCSP responder of our CA (Digicert), save the response in a file and tell HAP to use that file for stapling. The process can be described in two steps:</p>
 
 <ol>
-<li><p>Obtain the signed response from the OCSP authority</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/etc/haproxy# openssl ocsp -issuer DigiCertSecureServerCA.pem -cert star_mydomain_com.crt -url http://ocsp.digicert.com -header Host ocsp.digicert.com -no_nonce -noverify -respout star_mydomain_com.crt.ocsp
+<li>
+<p>Obtain the signed response from the OCSP authority</p>
+<div class="highlight"><pre><code class="language-" data-lang="">root@server:/etc/haproxy# openssl ocsp -issuer DigiCertSecureServerCA.pem -cert star_mydomain_com.crt -url http://ocsp.digicert.com -header Host ocsp.digicert.com -no_nonce -noverify -respout star_mydomain_com.crt.ocsp
 star_mydomain_com.crt: good
     This Update: Mar 29 12:05:00 2015 GMT
     Next Update: Apr  5 12:20:00 2015 GMT
-</code></pre></div></li>
-<li><p>Dynamically update HAP with this information</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@server:/etc/haproxy# echo &quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 /etc/haproxy/star_mydomain_com.crt.ocsp)&quot; | socat stdio unix-connect:/run/haproxy/admin.sock
+</code></pre></div>
+</li>
+<li>
+<p>Dynamically update HAP with this information</p>
+<div class="highlight"><pre><code class="language-" data-lang="">root@server:/etc/haproxy# echo "set ssl ocsp-response $(/usr/bin/base64 -w 10000 /etc/haproxy/star_mydomain_com.crt.ocsp)" | socat stdio unix-connect:/run/haproxy/admin.sock
 OCSP Response updated!
-</code></pre></div></li>
+</code></pre></div>
+</li>
 </ol>
 
 <p>We can automate the process with running the following script <code>/usr/local/bin/ocsp_update.sh</code> as cronjob on daily basis:</p>
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/bin/bash</span>
 
 <span class="c"># Certificates path and names</span>
-<span class="nv">DIR</span><span class="o">=</span><span class="s2">&quot;/etc/haproxy&quot;</span>
-<span class="nv">CERT</span><span class="o">=</span><span class="s2">&quot;star_mydomain_com.crt&quot;</span>
+<span class="nv">DIR</span><span class="o">=</span><span class="s2">"/etc/haproxy"</span>
+<span class="nv">CERT</span><span class="o">=</span><span class="s2">"star_mydomain_com.crt"</span>
 
-<span class="c"># Get the issuer URI, download it&#39;s certificate and convert into PEM format</span>
-<span class="nv">ISSUER_URI</span><span class="o">=</span><span class="k">$(</span>openssl x509 -in <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span> -text -noout <span class="p">|</span> grep <span class="s1">&#39;CA Issuers&#39;</span> <span class="p">|</span> cut -d: -f2,3<span class="k">)</span>
-<span class="nv">ISSUER_NAME</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="k">${</span><span class="nv">ISSUER_URI</span><span class="p">##*/</span><span class="k">}</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> -r fname<span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> <span class="k">${</span><span class="nv">fname</span><span class="p">%.*</span><span class="k">}</span><span class="p">;</span> <span class="k">done)</span>
-wget -q -O- <span class="nv">$ISSUER_URI</span> <span class="p">|</span> openssl x509 -inform DER -outform PEM -out <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">ISSUER_NAME</span><span class="k">}</span>.pem
+<span class="c"># Get the issuer URI, download it's certificate and convert into PEM format</span>
+<span class="nv">ISSUER_URI</span><span class="o">=</span><span class="k">$(</span>openssl x509 -in <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span> -text -noout | grep <span class="s1">'CA Issuers'</span> | cut -d: -f2,3<span class="k">)</span>
+<span class="nv">ISSUER_NAME</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="k">${</span><span class="nv">ISSUER_URI</span><span class="p">##*/</span><span class="k">}</span> | <span class="k">while </span><span class="nb">read</span> -r fname; <span class="k">do </span><span class="nb">echo</span> <span class="k">${</span><span class="nv">fname</span><span class="p">%.*</span><span class="k">}</span>; <span class="k">done)</span>
+wget -q -O- <span class="nv">$ISSUER_URI</span> | openssl x509 -inform DER -outform PEM -out <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">ISSUER_NAME</span><span class="k">}</span>.pem
 
 <span class="c"># Get the OCSP URL from the certificate</span>
 <span class="nv">ocsp_url</span><span class="o">=</span><span class="k">$(</span>openssl x509 -noout -ocsp_uri -in <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">})</span>
 
 <span class="c"># Extract the hostname from the OCSP URL</span>
-<span class="nv">ocsp_host</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$ocsp_url</span> <span class="p">|</span> cut -d/ -f3<span class="k">)</span>
+<span class="nv">ocsp_host</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$ocsp_url</span> | cut -d/ -f3<span class="k">)</span>
 
 <span class="c"># Create/update the ocsp response file and update HAProxy</span>
 openssl ocsp -noverify -no_nonce -issuer <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">ISSUER_NAME</span><span class="k">}</span>.pem -cert <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span> -url <span class="nv">$ocsp_url</span> -header Host <span class="nv">$ocsp_host</span> -respout <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span>.ocsp
-<span class="o">[[</span> <span class="nv">$?</span> -eq <span class="m">0</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>pidof haproxy<span class="k">)</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> -s <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span>.ocsp <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 ${DIR}/${CERT}.ocsp)&quot;</span> <span class="p">|</span> socat stdio unix-connect:/run/haproxy/admin.sock
+<span class="o">[[</span> <span class="nv">$?</span> -eq 0 <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="k">$(</span>pidof haproxy<span class="k">)</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> -s <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span>.ocsp <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"set ssl ocsp-response </span><span class="k">$(</span>/usr/bin/base64 -w 10000 <span class="k">${</span><span class="nv">DIR</span><span class="k">}</span>/<span class="k">${</span><span class="nv">CERT</span><span class="k">}</span>.ocsp<span class="k">)</span><span class="s2">"</span> | socat stdio unix-connect:/run/haproxy/admin.sock
 
 <span class="nb">exit </span>0
 </code></pre></div>
-<p>The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc.</p>
-
+<p>The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc. For the case of DigiCert the OCSP gets updated weekly so we can set a cronjob for the root user to update haproxy, for example:</p>
+<div class="highlight"><pre><code class="language-" data-lang=""># HAP OCSP
+0 5 * * * /usr/local/bin/ocsp_update.sh
+</code></pre></div>
 <p>To test the OCSP stapling:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@igor-laptop:~/Downloads$ echo quit | openssl s_client -connect server.mydomain.com:443 -status
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@igor-laptop:~/Downloads$ echo quit | openssl s_client -connect server.mydomain.com:443 -status
 CONNECTED(00000003)
 depth=2 C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
 verify error:num=19:self signed certificate in certificate chain
@@ -176,7 +203,8 @@ Certificate chain
 	    })();
 
 	</script>
-	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 </div>
 
 </article>

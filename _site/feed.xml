@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-02T03:00:08+11:00</updated><id>http://icicimov.github.io/</id><title>Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="http://icicimov.github.io/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://icicimov.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://icicimov.github.io/" rel="alternate" type="text/html" /><updated>2016-10-02T12:15:15+11:00</updated><id>http://icicimov.github.io/</id><title type="html">Igor Cicimov</title><subtitle>DevOps at Encompass</subtitle><entry><title type="html">Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2</title><link href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/" rel="alternate" type="text/html" title="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" /><published>2016-04-04T00:00:00+10:00</published><updated>2016-04-04T00:00:00+10:00</updated><id>http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2</id><content type="html" xml:base="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">&lt;p&gt;Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.&lt;/p&gt;
 
 &lt;p&gt;The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&amp;#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.&lt;/p&gt;
 
@@ -11,15 +11,15 @@
 &lt;h3&gt;OpenSSL&lt;/h3&gt;
 
 &lt;p&gt;Standard compile procedure, we start by installing some needed packages:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and then downloading and extracting the source:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo wget http://www.openssl.org/source/openssl-1.0.2g.tar.gz
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo wget http://www.openssl.org/source/openssl-1.0.2g.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf openssl-1.0.2g.tar.gz
 igorc@sl01:/opt$ sudo chown -R igorc\: openssl-1.0.2g
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Next we change to the source directory and create the openssl.ld file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ cd openssl-1.0.2g/
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ cd openssl-1.0.2g/
 igorc@sl01:~/openssl-1.0.2g$ vi openssl.ld
 OPENSSL_1.0.0 {
     global:
@@ -27,13 +27,13 @@ OPENSSL_1.0.0 {
 };
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and finally compile and install the software:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ./config --prefix=/opt/openssl zlib-dynamic shared -Wl,--version-script=/home/igorc/openssl-1.0.2g/openssl.ld -Wl,-Bsymbolic-functions
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ./config --prefix=/opt/openssl zlib-dynamic shared -Wl,--version-script=/home/igorc/openssl-1.0.2g/openssl.ld -Wl,-Bsymbolic-functions
 igorc@sl01:/opt/openssl-1.0.2g$ make depend
 igorc@sl01:/opt/openssl-1.0.2g$ make all
 igorc@sl01:/opt/openssl-1.0.2g$ sudo make install
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This will set OpenSSL 1.0.2g under /opt/openssl directory:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ls -l /opt/openssl
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt/openssl-1.0.2g$ ls -l /opt/openssl
 total 16
 drwxr-xr-x 2 root root 4096 Apr  2 19:18 bin
 drwxr-xr-x 3 root root 4096 Apr  2 19:18 include
@@ -43,7 +43,7 @@ drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
 &lt;h3&gt;Java8&lt;/h3&gt;
 
 &lt;p&gt;One liner installation:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;amp;&amp;amp; echo &amp;quot;deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&amp;quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; echo &amp;quot;deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&amp;quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;amp;&amp;amp; sudo aptitude update &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-installer &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-set-default
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;amp;&amp;amp; echo &quot;deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; echo &quot;deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&quot; | sudo tee -a /etc/apt/sources.list &amp;amp;&amp;amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;amp;&amp;amp; sudo aptitude update &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-installer &amp;amp;&amp;amp; sudo aptitude install -y oracle-java8-set-default
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This will add the needed Ubuntu ppa, install the latest Oracle 1.8 JDK and set it as default Java environment.&lt;/p&gt;
 
@@ -52,8 +52,8 @@ drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
 &lt;h4&gt;Installation&lt;/h4&gt;
 
 &lt;p&gt;Get and unpack the latest Tomcat9 release, alfa version v9.0.0.M4 at the moment of this writing, and setup tomcat user:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
-igorc@sl01:/opt$ sudo useradd -r -c &amp;quot;Tomcat9 user&amp;quot; -s /bin/false -M -d /usr/share/tomcat9 -g 501 -u 501 -G www-data tomcat9
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
+igorc@sl01:/opt$ sudo useradd -r -c &quot;Tomcat9 user&quot; -s /bin/false -M -d /usr/share/tomcat9 -g 501 -u 501 -G www-data tomcat9
 igorc@sl01:/opt$ sudo wget http://apache.uberglobalmirror.com/tomcat/tomcat-9/v9.0.0.M4/bin/apache-tomcat-9.0.0.M4.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf apache-tomcat-9.0.0.M4.tar.gz
 igorc@sl01:/opt$ sudo mv apache-tomcat-9.0.0.M4 /usr/share/tomcat9
@@ -64,10 +64,10 @@ igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/conf /etc/tomcat9
 &lt;h4&gt;TC-Native&lt;/h4&gt;
 
 &lt;p&gt;We install the needed packages first:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and then we download and etract the tcnative source, xtract and build it against oopenssl-1.0.2g we installed previously:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo wget http://apache.mirror.digitalpacific.com.au/tomcat/tomcat-connectors/native/1.2.5/source/tomcat-native-1.2.5-src.tar.gz
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo wget http://apache.mirror.digitalpacific.com.au/tomcat/tomcat-connectors/native/1.2.5/source/tomcat-native-1.2.5-src.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf tomcat-native-1.2.5-src.tar.gz
 igorc@sl01:/opt$ cd tomcat-native-1.2.5-src/native
 igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ./configure --prefix=/usr --libdir=/usr/lib --with-apr=/usr/bin/apr-1-config --with-java-home=/usr/lib/jvm/java-8-oracle --with-ssl=/opt/openssl
@@ -75,7 +75,7 @@ igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ make
 igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ sudo make install
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;We check that tcnative is properly linked to the right openssl version (in case you have more than one installed):&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ldd /usr/lib/libtcnative-1.so.0.2.5
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ldd /usr/lib/libtcnative-1.so.0.2.5
 linux-vdso.so.1 =&amp;gt;  (0x00007ffcd2ba5000)
 libssl.so.1.0.0 =&amp;gt; /opt/openssl/lib/libssl.so.1.0.0 (0x00007f67d06a1000)
 libcrypto.so.1.0.0 =&amp;gt; /opt/openssl/lib/libcrypto.so.1.0.0 (0x00007f67d0251000)
@@ -90,15 +90,15 @@ libuuid.so.1 =&amp;gt; /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007f67cf41b000)
 &lt;h4&gt;Config and SSL setup&lt;/h4&gt;
 
 &lt;p&gt;I wanted to test the ECDSA certificate type and multi-certificate support in tomcat9. First create ECC cert and install it so tomcat can find it:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&amp;lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj &amp;#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&amp;#39;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&amp;lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj '/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com'
 igorc@sl01:~$ sudo mkdir /etc/tomcat9/ssl
 igorc@sl01:~$ sudo cp cert_ecdsa.key cert_ecdsa.crt /etc/tomcat9/ssl/
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Then created a standard RSA one too:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
 igorc@sl01:~$ openssl rsa -passin pass:x -in server.pass.key -out server.key
 igorc@sl01:~$ rm server.pass.key
-igorc@sl01:~$ openssl req -new -key server.key -out server.csr -subj &amp;#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&amp;#39;
+igorc@sl01:~$ openssl req -new -key server.key -out server.csr -subj '/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com'
 igorc@sl01:~$ openssl x509 -req -days 7200 -in server.csr -signkey server.key -out server.crt
 Signature ok
 subject=/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com
@@ -106,24 +106,24 @@ Getting Private key
 igorc@sl01:~$ sudo cp server.key server.crt /etc/tomcat9/ssl/
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Now we can configure tomcat9&amp;#39;s SSL/TLS connector with HTTP/2 support. Replace the default &lt;code&gt;&amp;lt;Connector&amp;gt;&lt;/code&gt; section in the tomcat&amp;#39;s server.xml file, in our case &lt;code&gt;/etc/tomcat9/server.xml&lt;/code&gt;, with the one below:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;    &amp;lt;Connector port=&amp;quot;8443&amp;quot; protocol=&amp;quot;org.apache.coyote.http11.Http11AprProtocol&amp;quot;
-               maxThreads=&amp;quot;150&amp;quot; SSLEnabled=&amp;quot;true&amp;quot; scheme=&amp;quot;https&amp;quot; secure=&amp;quot;true&amp;quot; &amp;gt;
-        &amp;lt;UpgradeProtocol className=&amp;quot;org.apache.coyote.http2.Http2Protocol&amp;quot; /&amp;gt;
-        &amp;lt;SSLHostConfig honorCipherOrder=&amp;quot;true&amp;quot; disableCompression=&amp;quot;true&amp;quot; protocols=&amp;quot;all&amp;quot;
-                       ciphers=&amp;quot;EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;    &amp;lt;Connector port=&quot;8443&quot; protocol=&quot;org.apache.coyote.http11.Http11AprProtocol&quot;
+               maxThreads=&quot;150&quot; SSLEnabled=&quot;true&quot; scheme=&quot;https&quot; secure=&quot;true&quot; &amp;gt;
+        &amp;lt;UpgradeProtocol className=&quot;org.apache.coyote.http2.Http2Protocol&quot; /&amp;gt;
+        &amp;lt;SSLHostConfig honorCipherOrder=&quot;true&quot; disableCompression=&quot;true&quot; protocols=&quot;all&quot;
+                       ciphers=&quot;EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384
                        EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4
-                       EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4&amp;quot; &amp;gt;
-            &amp;lt;Certificate certificateKeyFile=&amp;quot;conf/ssl/cert_ecdsa.key&amp;quot;
-                         certificateFile=&amp;quot;conf/ssl/cert_ecdsa.crt&amp;quot;
-                         type=&amp;quot;EC&amp;quot; /&amp;gt;
-            &amp;lt;Certificate certificateKeyFile=&amp;quot;conf/ssl/server.key&amp;quot;
-                         certificateFile=&amp;quot;conf/ssl/server.crt&amp;quot;
-                         type=&amp;quot;RSA&amp;quot; /&amp;gt;
+                       EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4&quot; &amp;gt;
+            &amp;lt;Certificate certificateKeyFile=&quot;conf/ssl/cert_ecdsa.key&quot;
+                         certificateFile=&quot;conf/ssl/cert_ecdsa.crt&quot;
+                         type=&quot;EC&quot; /&amp;gt;
+            &amp;lt;Certificate certificateKeyFile=&quot;conf/ssl/server.key&quot;
+                         certificateFile=&quot;conf/ssl/server.crt&quot;
+                         type=&quot;RSA&quot; /&amp;gt;
         &amp;lt;/SSLHostConfig&amp;gt;
     &amp;lt;/Connector&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Now we can start the server:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo /usr/share/tomcat9/bin/startup.sh
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo /usr/share/tomcat9/bin/startup.sh
 Using CATALINA_BASE:   /usr/share/tomcat9
 Using CATALINA_HOME:   /usr/share/tomcat9
 Using CATALINA_TMPDIR: /usr/share/tomcat9/temp
@@ -132,11 +132,11 @@ Using CLASSPATH:       /usr/share/tomcat9/bin/bootstrap.jar:/usr/share/tomcat9/b
 Tomcat started.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and check for the features we need in the log file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:/opt$ sudo grep -E &amp;quot;AprLifecycleListener|h2&amp;quot; /var/log/tomcat9/catalina.out
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:/opt$ sudo grep -E &quot;AprLifecycleListener|h2&quot; /var/log/tomcat9/catalina.out
 02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded APR based Apache Tomcat Native library 1.2.5 using APR version 1.5.1.
 02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
 02-Apr-2016 20:29:05.881 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized (OpenSSL 1.0.2g  1 Mar 2016)
-02-Apr-2016 20:29:05.883 INFO [main] org.apache.coyote.http11.AbstractHttp11Protocol.configureUpgradeProtocol The [&amp;quot;https-apr-8443&amp;quot;] connector has been configured to support negotiation to [h2] via ALPN
+02-Apr-2016 20:29:05.883 INFO [main] org.apache.coyote.http11.AbstractHttp11Protocol.configureUpgradeProtocol The [&quot;https-apr-8443&quot;] connector has been configured to support negotiation to [h2] via ALPN
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;We can see the APR connector, the correct OpenSSL version and the h2 protocol available via ALPN (Application-Layer Protocol Negotiation).&lt;/p&gt;
 
@@ -147,7 +147,7 @@ Tomcat started.
 &lt;p&gt;To test the server I used the trusted curl. It came up it was little bit painful to set it up due to lot of prerequisites but since I&amp;#39;ve done it I might show it here as well. There are some other HTTP/2 testing tools available that you can use in case you have domain name registered with proper DNS resolution setup.&lt;/p&gt;
 
 &lt;p&gt;First the SPDY (Google extension which is now becoming obsolete with http2) support:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ git clone https://github.com/tatsuhiro-t/spdylay.git
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ git clone https://github.com/tatsuhiro-t/spdylay.git
 igorc@sl01:~$ cd spdylay/
 igorc@sl01:~$ autoreconf -i
 igorc@sl01:~$ automake
@@ -165,12 +165,12 @@ igorc@sl01:~$ sudo ln -s /usr/local/lib/libspdylay.so.7.2.0 /lib/x86_64-linux-gn
 igorc@sl01:~$ sudo ldconfig
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Next is nghhtp2:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ git clone https://github.com/nghttp2/nghttp2.git
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ git clone https://github.com/nghttp2/nghttp2.git
 igorc@sl01:~$ cd nghttp2
 igorc@sl01:~$ autoreconf -i
 igorc@sl01:~$ automake
 igorc@sl01:~$ autoconf
-igorc@sl01:~$ OPENSSL_CFLAGS=&amp;quot;-I/opt/openssl/include&amp;quot; OPENSSL_LIBS=&amp;quot;-L/opt/openssl/lib -lssl -lcrypto -ldl&amp;quot; ./configure PYTHON=/usr/bin/python3
+igorc@sl01:~$ OPENSSL_CFLAGS=&quot;-I/opt/openssl/include&quot; OPENSSL_LIBS=&quot;-L/opt/openssl/lib -lssl -lcrypto -ldl&quot; ./configure PYTHON=/usr/bin/python3
 igorc@sl01:~$ make
 igorc@sl01:~$ sudo make install
 igorc@sl01:~$ sudo updatedb
@@ -186,7 +186,7 @@ igorc@sl01:~$ sudo ln -s /usr/local/lib/libnghttp2.so.14.0.2 /lib/x86_64-linux-g
 igorc@sl01:~$ sudo ldconfig
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Finally checking the versions installed:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ nghttp --version
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ nghttp --version
 nghttp nghttp2/1.10.0-DEV
 igorc@sl01:~$ nghttpx --version
 nghttpx nghttp2/1.10.0-DEV
@@ -196,6 +196,7 @@ igorc@sl01:~$ h2load --version
 h2load nghttp2/1.10.0-DEV
 
 We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):
+
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;$ sudo nghttpx \
     --frontend=*,443 \
@@ -205,22 +206,22 @@ We can use this tool as SSL proxy if needed (nothing to do with the test, just m
 ```&lt;/p&gt;
 
 &lt;p&gt;Or turn it into service:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
 $ sudo service nghttpx restart
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;And finally CuRL:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ wget https://curl.haxx.se/download/curl-7.48.0.tar.gz
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ wget https://curl.haxx.se/download/curl-7.48.0.tar.gz
 igorc@sl01:~$ tar -xzf curl-7.48.0.tar.gz
 igorc@sl01:~$ cd curl-7.48.0/
 igorc@sl01:~$ PKG_CONFIG_LIBDIR=/opt/openssl/lib/pkgconfig/ ./configure --with-ssl=/opt/openssl --with-nghttp2=/usr/local
 igorc@sl01:~$ make &amp;amp;&amp;amp; sudo make install
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Now we set the correct binary and library paths so curl can find them:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ export PATH=/opt/openssl/bin:/usr/local/bin:igorc@sl01:~$PATH
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ export PATH=/opt/openssl/bin:/usr/local/bin:igorc@sl01:~$PATH
 igorc@sl01:~$ export LD_LIBRARY_PATH=/opt/openssl/lib:igorc@sl01:~$LD_LIBRARY_PATH
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Check the openssl and curl binaries and their features:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ openssl version
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ openssl version
 OpenSSL 1.0.2g  1 Mar 2016
 
 igorc@sl01:~$ curl --version
@@ -231,7 +232,7 @@ Features: IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP HTTP2 UnixSockets
 &lt;p&gt;From the above output we can confirm that curl has http2 support.&lt;/p&gt;
 
 &lt;p&gt;With all this done we can run the test. I tested for both when we have only ECDSA/ECC certificate configured in tomcat, since I wanted to see this cert in action:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
 *   Trying 127.0.0.1...
 * Connected to localhost (127.0.0.1) port 8443 (#0)
 * ALPN, offering h2
@@ -293,7 +294,7 @@ Features: IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP HTTP2 UnixSockets
 igorc@sl01:~$
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and when both cert types are configured as per our example above:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
 *   Trying 127.0.0.1...
 * Connected to localhost (127.0.0.1) port 8443 (#0)
 * ALPN, offering h2
@@ -364,7 +365,7 @@ igorc@sl01:~$
 &lt;li&gt;&lt;a href=&quot;https://github.com/jfclere/h2_demos&quot;&gt;Tomcat HTTP/2 demo app&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://github.com/http2/http2-spec/wiki/Implementations&quot;&gt;HTTP/2 implementation tracking&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://github.com/fstab/h2c&quot;&gt;H2C simple HTTP/2 command line test tool&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="tomcat" /><category term="ssl" /><category term="http2" /><summary>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</summary></entry><entry><title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</title><link href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" rel="alternate" type="text/html" title="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" /><published>2016-03-18T00:00:00+11:00</published><updated>2016-03-18T00:00:00+11:00</updated><id>http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system</id><content type="html" xml:base="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">&lt;p&gt;During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the &lt;a href=&quot;http://activemq.apache.org/shared-file-system-master-slave.html&quot;&gt;Apache project site&lt;/a&gt;:&lt;/p&gt;
+&lt;/ul&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="tomcat" /><category term="ssl" /><category term="http2" /><summary type="html">Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</summary></entry><entry><title type="html">ActiveMQ Master/Slave KahaDB on OCFS2 shared file system</title><link href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/" rel="alternate" type="text/html" title="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" /><published>2016-03-18T00:00:00+11:00</published><updated>2016-03-18T00:00:00+11:00</updated><id>http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system</id><content type="html" xml:base="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">&lt;p&gt;During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the &lt;a href=&quot;http://activemq.apache.org/shared-file-system-master-slave.html&quot;&gt;Apache project site&lt;/a&gt;:&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;OCFS2 Warning&lt;/strong&gt;&lt;/p&gt;
@@ -385,13 +386,13 @@ igorc@sl01:~$
 &lt;p&gt;And true enough, when tested ActiveMQ-5.11.1 on one of the OCFS2 clusters, what happened is that both servers started as master due to lack of lock file on the share. Investigating further it came up that some good man created a patch that Apache never bothered to apply from some unknown reason. The case link &lt;a href=&quot;https://issues.apache.org/jira/browse/AMQ-4694&quot;&gt;AMQ-4694&lt;/a&gt;. The patch was attached to the ticket so thought I would try it and apply to latest 5.11.4 version.&lt;/p&gt;
 
 &lt;p&gt;Downloaded the source:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# aptitude install zip
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~# aptitude install zip
 root@drbd01:~# wget http://mirror.ventraip.net.au/apache/activemq/5.11.4/activemq-parent-5.11.4-source-release.zip
 root@drbd01:~# unzip activemq-parent-5.11.4-source-release.zip
 root@drbd01:~# cd activemq-parent-5.11.4/
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and applied the patch:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi ocfs2-locks.patch
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi ocfs2-locks.patch
 root@drbd01:~/activemq-parent-5.11.4# patch -p0 -i ocfs2-locks.patch
 patching file NOTICE
 Hunk #1 succeeded at 45 with fuzz 2 (offset -4 lines).
@@ -413,19 +414,19 @@ patching file pom.xml
 Hunk #1 succeeded at 881 with fuzz 1 (offset 44 lines).
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Ok, so all good except it failed for the SharedFileLocker.java file. Easily fixed by applying that part of the patch manually:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# vi activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the &amp;quot;License&amp;quot;); you may not use this file except in compliance with
+ * (the &quot;License&quot;); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &amp;quot;AS IS&amp;quot; BASIS,
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -439,7 +440,7 @@ import org.apache.activemq.util.LockResource;
 /**
  * An {@link AbstractResourceLocker} that utilizes a {@link LockFile}.
  *
- * @org.apache.xbean.XBean element=&amp;quot;shared-file-locker&amp;quot;
+ * @org.apache.xbean.XBean element=&quot;shared-file-locker&quot;
  *
  */
 public class SharedFileLocker extends AbstractResourceLocker {
@@ -451,39 +452,39 @@ public class SharedFileLocker extends AbstractResourceLocker {
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Next installed Maven:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# wget http://apache.uberglobalmirror.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~# wget http://apache.uberglobalmirror.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 root@drbd01:~# tar -xzvf apache-maven-3.3.9-bin.tar.gz
 root@drbd01:~# mv apache-maven-3.3.9 /usr/local/
 root@drbd01:~# export PATH=/usr/local/apache-maven-3.3.9/bin:$PATH
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Back to AMQ directory and build the project:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# mvn -Dtest=false -DfailIfNoTests=false clean install -e -X
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~/activemq-parent-5.11.4# mvn -Dtest=false -DfailIfNoTests=false clean install -e -X
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Install the built binaries:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:~# tar -xzvf /root/.m2/repository/org/apache/activemq/apache-activemq/5.11.4/apache-activemq-5.11.4-bin.tar.gz -C /opt/
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:~# tar -xzvf /root/.m2/repository/org/apache/activemq/apache-activemq/5.11.4/apache-activemq-5.11.4-bin.tar.gz -C /opt/
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and copy the setup from the previous AMQ version into the new one:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# cp -a apache-activemq-5.11.1/conf/{log4j.properties,jmx.access,jmx.password,jetty.xml,encompass-activemq.xml,star_encompasshost_com.jks} apache-activemq-5.11.4/conf/
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:/opt# cp -a apache-activemq-5.11.1/conf/{log4j.properties,jmx.access,jmx.password,jetty.xml,encompass-activemq.xml,star_encompasshost_com.jks} apache-activemq-5.11.4/conf/
 root@drbd01:/opt# chown -R activemq\: apache-activemq-5.11.4
 root@drbd01:/opt# rm activemq
 root@drbd01:/opt# ln -s apache-activemq-5.11.4 activemq
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;The last bit is modifying the KahaDB locker to use the newly introduced shared-native-file-locker one:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# vi activemq/conf/activemq.xml
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:/opt# vi activemq/conf/activemq.xml
 [...]
     &amp;lt;persistenceAdapter&amp;gt;
-        &amp;lt;kahaDB directory=&amp;quot;/share/activemq-data&amp;quot;
-               indexCacheSize=&amp;quot;40000&amp;quot;
-               checkForCorruptJournalFiles=&amp;quot;true&amp;quot;&amp;gt;
+        &amp;lt;kahaDB directory=&quot;/share/activemq-data&quot;
+               indexCacheSize=&quot;40000&quot;
+               checkForCorruptJournalFiles=&quot;true&quot;&amp;gt;
                &amp;lt;locker&amp;gt;
-                  &amp;lt;shared-native-file-locker lockAcquireSleepInterval=&amp;quot;5000&amp;quot;/&amp;gt;
+                  &amp;lt;shared-native-file-locker lockAcquireSleepInterval=&quot;5000&quot;/&amp;gt;
                &amp;lt;/locker&amp;gt;
          &amp;lt;/kahaDB&amp;gt;
     &amp;lt;/persistenceAdapter&amp;gt;
 [...]
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;After copying over the binary tarball to the other server, installing and performing the above steps, I started the server and the lock file was indeed created this time:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd01:/opt# ls -ltr /share/activemq-data/
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd01:/opt# ls -ltr /share/activemq-data/
 total 160
 drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 -rw-r--r-- 1 root     root            5 Mar 17 15:30 test
@@ -493,10 +494,10 @@ drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 -rw-r--r-- 1 activemq activemq    12288 Mar 17 18:17 db.data
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and the other server can see it:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@drbd02:/opt# start activemq &amp;amp;&amp;amp; tail -f /opt/activemq/data/activemq.log | grep -i lock
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@drbd02:/opt# start activemq &amp;amp;&amp;amp; tail -f /opt/activemq/data/activemq.log | grep -i lock
 2016-03-18 10:00:15,375 | INFO  | Database /share/activemq-data/lock is locked... waiting 5 seconds for the database to be unlocked. Reason: java.io.IOException: failed to acquire lock: [11] ( | org.apache.activemq.store.SharedNativeFileLocker | main
 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="activemq" /><category term="ocfs2" /><summary>During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the Apache project site:</summary></entry><entry><title>HAProxy dynamically adjust server weight using external agent</title><link href="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/" rel="alternate" type="text/html" title="HAProxy dynamically adjust server weight using external agent" /><published>2015-10-13T00:00:00+11:00</published><updated>2015-10-13T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">&lt;p&gt;Trying to utilize HAProxy-1.5/1.6 &lt;code&gt;agent-check&lt;/code&gt; feature, see &lt;a href=&quot;http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check&quot;&gt;HAProxy documentation&lt;/a&gt;, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="activemq" /><category term="ocfs2" /><summary type="html">During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the Apache project site:</summary></entry><entry><title type="html">HAProxy dynamically adjust server weight using external agent</title><link href="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/" rel="alternate" type="text/html" title="HAProxy dynamically adjust server weight using external agent" /><published>2015-10-13T00:00:00+11:00</published><updated>2015-10-13T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">&lt;p&gt;Trying to utilize HAProxy-1.5/1.6 &lt;code&gt;agent-check&lt;/code&gt; feature, see &lt;a href=&quot;http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#5.2-agent-check&quot;&gt;HAProxy documentation&lt;/a&gt;, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.&lt;/p&gt;
 
 &lt;p&gt;This will run as xinetd service on the Tomcats, for example made available to HAP on port 9707 (some randomly chosen free port).&lt;/p&gt;
 
@@ -512,31 +513,31 @@ drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;LMAX&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;90
 
-&lt;span class=&quot;nv&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;uptime &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep -E -o &lt;span class=&quot;s1&quot;&gt;&amp;#39;load average[s:][: ].*&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/,//g&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d&lt;span class=&quot;s1&quot;&gt;&amp;#39; &amp;#39;&lt;/span&gt; -f3-5&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;cpus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;grep processor /proc/cpuinfo &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; wc -l&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;uptime | grep -E -o &lt;span class=&quot;s1&quot;&gt;'load average[s:][: ].*'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/,//g'&lt;/span&gt; | cut -d&lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; -f3-5&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;cpus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;grep processor /proc/cpuinfo | wc -l&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
 
-&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r l1 l5 l15&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nv&quot;&gt;l5util&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$l5/$cpus*100&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; bc -l &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d&lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt; -f1&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;up 100%&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -gt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt &lt;span class=&quot;m&quot;&gt;100&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;up 50%&amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;down#CPU overload&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &amp;lt; &amp;lt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r l1 l5 l15; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;l5util&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$l5&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$cpus&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;*100&quot;&lt;/span&gt; | bc -l | cut -d&lt;span class=&quot;s2&quot;&gt;&quot;.&quot;&lt;/span&gt; -f1&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;;
+    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;up 100%&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0;
+    &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -gt &lt;span class=&quot;nv&quot;&gt;$LMAX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$l5util&lt;/span&gt; -lt 100 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;up 50%&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0;
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;down#CPU overload&quot;&lt;/span&gt;;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &amp;lt; &amp;lt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 
 &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Set it to be executable:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21:~# chmod +x /usr/local/bin/haproxy-agent-check
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@app21:~# chmod +x /usr/local/bin/haproxy-agent-check
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Next we set it as xinetd service, first install xinetd:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21:~# aptitude install -y xinetd
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@app21:~# aptitude install -y xinetd
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Then add our service to the system services in &lt;code&gt;/etc/services&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;...
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;...
 haproxy-agent-check 9707/tcp                # haproxy-agent-check
 ...
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Create the xinetd daemon file &lt;code&gt;/etc/xinetd.d/haproxy-agent-check&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;# default: on
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;# default: on
 # description: haproxy-agent-check
 service haproxy-agent-check
 {
@@ -553,15 +554,15 @@ service haproxy-agent-check
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;To allow access from specific subnets instead of hosts we can use the following format:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;only_from       = 10.22.0.0 10.22.1.0 10.22.2.0 127.0.0.1
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;only_from       = 10.22.0.0 10.22.1.0 10.22.2.0 127.0.0.1
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Make it executable, restart xinetd and test:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@app21-hap:~# chmod +x /etc/xinetd.d/haproxy-agent-check
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@app21-hap:~# chmod +x /etc/xinetd.d/haproxy-agent-check
 root@app21-:~# service xinetd restart
 root@app21:~# telnet 127.0.0.1 9707
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
-Escape character is &amp;#39;^]&amp;#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -570,23 +571,23 @@ Connection closed by foreign host.
 &lt;h1&gt;On the HAProxy LB&amp;#39;s&lt;/h1&gt;
 
 &lt;p&gt;Open the TCP port 9707 in the APP servers firewall and Test the agent-check connectivity from HAP serers to the app servers:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@lb1:~# telnet ip-172-31-17-41 9707
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@lb1:~# telnet ip-172-31-17-41 9707
 Trying 172.31.17.41...
 Connected to ip-172-31-17-41.ap-southeast-2.compute.internal.
-Escape character is &amp;#39;^]&amp;#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 
 root@lb1:~# telnet ip-172-31-11-41 9707
 Trying 172.31.11.41...
 Connected to ip-172-31-11-41.ap-southeast-2.compute.internal.
-Escape character is &amp;#39;^]&amp;#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 root@lb1:~#
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Add &lt;code&gt;agent-check&lt;/code&gt;, &lt;code&gt;agent-port&lt;/code&gt; and &lt;code&gt;agent-inter&lt;/code&gt; parameters to the backend servers in the &lt;code&gt;/etc/haproxy/haproxy.cfg&lt;/code&gt; config file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;...
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;...
 listen https-in
 ...
     default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 200 maxqueue 250 weight 100 error-limit 10 on-error mark-down on-marked-down shutdown-sessions agent-port 9707 agent-inter 30s
@@ -595,13 +596,13 @@ listen https-in
     server localhost 127.0.0.1:8080 maxconn 500 backup weight 1
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;And reload HAP service. Check the health status:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@lb1:~# echo &amp;quot;show stat&amp;quot; | socat stdio unix-connect:/run/haproxy/admin.sock | cut -d &amp;#39;,&amp;#39; -f1,2,18,19 | grep https
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@lb1:~# echo &quot;show stat&quot; | socat stdio unix-connect:/run/haproxy/admin.sock | cut -d ',' -f1,2,18,19 | grep https
 https-in,ip-172-31-17-41,UP,100
 https-in,ip-172-31-11-41,UP,100
 https-in,localhost,no check,1
 https-in,BACKEND,UP,200
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="haproxy" /><summary>Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry><entry><title>HAProxy OCSP stapling</title><link href="http://icicimov.github.io/HAProxy-OCSP-stapling/" rel="alternate" type="text/html" title="HAProxy OCSP stapling" /><published>2015-03-30T00:00:00+11:00</published><updated>2015-03-30T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-OCSP-stapling</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-OCSP-stapling/">&lt;p&gt;The &lt;strong&gt;Online Certificate Status Protocol (OCSP)&lt;/strong&gt; is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.&lt;/p&gt;
+&lt;p&gt;We can see the weight of both app servers is set to 100 atm but this should change if/when they come under high load for 5 minutes.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="haproxy" /><summary type="html">Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.</summary></entry><entry><title type="html">HAProxy OCSP stapling</title><link href="http://icicimov.github.io/HAProxy-OCSP-stapling/" rel="alternate" type="text/html" title="HAProxy OCSP stapling" /><published>2015-03-30T00:00:00+11:00</published><updated>2015-03-30T00:00:00+11:00</updated><id>http://icicimov.github.io/HAProxy-OCSP-stapling</id><content type="html" xml:base="http://icicimov.github.io/HAProxy-OCSP-stapling/">&lt;p&gt;The &lt;strong&gt;Online Certificate Status Protocol (OCSP)&lt;/strong&gt; is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.&lt;/p&gt;
 
 &lt;p&gt;OCSP stapling, formally known as the TLS Certificate Status Request extension, is an alternative approach to the OCSP for checking the revocation status of X.509 digital certificates. It allows the presenter (the server) of a certificate to bear the resource cost involved in providing OCSP responses by appending (&amp;quot;stapling&amp;quot;) a time-stamped OCSP response signed by the CA to the initial TLS Handshake, eliminating the need for clients to contact the CA.&lt;/p&gt;
 
@@ -611,13 +612,13 @@ https-in,BACKEND,UP,200
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;Obtain the signed response from the OCSP authority&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/etc/haproxy# openssl ocsp -issuer DigiCertSecureServerCA.pem -cert star_mydomain_com.crt -url http://ocsp.digicert.com -header Host ocsp.digicert.com -no_nonce -noverify -respout star_mydomain_com.crt.ocsp
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/etc/haproxy# openssl ocsp -issuer DigiCertSecureServerCA.pem -cert star_mydomain_com.crt -url http://ocsp.digicert.com -header Host ocsp.digicert.com -no_nonce -noverify -respout star_mydomain_com.crt.ocsp
 star_mydomain_com.crt: good
     This Update: Mar 29 12:05:00 2015 GMT
     Next Update: Apr  5 12:20:00 2015 GMT
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Dynamically update HAP with this information&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/etc/haproxy# echo &amp;quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 /etc/haproxy/star_mydomain_com.crt.ocsp)&amp;quot; | socat stdio unix-connect:/run/haproxy/admin.sock
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/etc/haproxy# echo &quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 /etc/haproxy/star_mydomain_com.crt.ocsp)&quot; | socat stdio unix-connect:/run/haproxy/admin.sock
 OCSP Response updated!
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
 &lt;/ol&gt;
@@ -626,30 +627,32 @@ OCSP Response updated!
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# Certificates path and names&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;/etc/haproxy&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;star_mydomain_com.crt&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/etc/haproxy&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;star_mydomain_com.crt&quot;&lt;/span&gt;
 
-&lt;span class=&quot;c&quot;&gt;# Get the issuer URI, download it&amp;#39;s certificate and convert into PEM format&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;openssl x509 -in &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; -text -noout &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep &lt;span class=&quot;s1&quot;&gt;&amp;#39;CA Issuers&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d: -f2,3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;##*/&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r fname&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;fname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done)&lt;/span&gt;
-wget -q -O- &lt;span class=&quot;nv&quot;&gt;$ISSUER_URI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; openssl x509 -inform DER -outform PEM -out &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.pem
+&lt;span class=&quot;c&quot;&gt;# Get the issuer URI, download it's certificate and convert into PEM format&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;openssl x509 -in &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; -text -noout | grep &lt;span class=&quot;s1&quot;&gt;'CA Issuers'&lt;/span&gt; | cut -d: -f2,3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_URI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;##*/&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; | &lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r fname; &lt;span class=&quot;k&quot;&gt;do &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;fname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%.*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;; &lt;span class=&quot;k&quot;&gt;done)&lt;/span&gt;
+wget -q -O- &lt;span class=&quot;nv&quot;&gt;$ISSUER_URI&lt;/span&gt; | openssl x509 -inform DER -outform PEM -out &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.pem
 
 &lt;span class=&quot;c&quot;&gt;# Get the OCSP URL from the certificate&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;ocsp_url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;openssl x509 -noout -ocsp_uri -in &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;})&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# Extract the hostname from the OCSP URL&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;ocsp_host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ocsp_url&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; cut -d/ -f3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;ocsp_host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ocsp_url&lt;/span&gt; | cut -d/ -f3&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# Create/update the ocsp response file and update HAProxy&lt;/span&gt;
 openssl ocsp -noverify -no_nonce -issuer &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISSUER_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.pem -cert &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; -url &lt;span class=&quot;nv&quot;&gt;$ocsp_url&lt;/span&gt; -header Host &lt;span class=&quot;nv&quot;&gt;$ocsp_host&lt;/span&gt; -respout &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp
-&lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$?&lt;/span&gt; -eq &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;pidof haproxy&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; -s &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;set ssl ocsp-response $(/usr/bin/base64 -w 10000 ${DIR}/${CERT}.ocsp)&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; socat stdio unix-connect:/run/haproxy/admin.sock
+&lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$?&lt;/span&gt; -eq 0 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;pidof haproxy&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; -s &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;set ssl ocsp-response &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;/usr/bin/base64 -w 10000 &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DIR&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CERT&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.ocsp&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; | socat stdio unix-connect:/run/haproxy/admin.sock
 
 &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc.&lt;/p&gt;
-
+&lt;p&gt;The script, apart from the last line that updates the HAP, is pretty generic and can be used with any PEM type certificate with some other services like Apache, Nginx etc. For the case of DigiCert the OCSP gets updated weekly so we can set a cronjob for the root user to update haproxy, for example:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;# HAP OCSP
+0 5 * * * /usr/local/bin/ocsp_update.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;To test the OCSP stapling:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;igorc@igor-laptop:~/Downloads$ echo quit | openssl s_client -connect server.mydomain.com:443 -status
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;igorc@igor-laptop:~/Downloads$ echo quit | openssl s_client -connect server.mydomain.com:443 -status
 CONNECTED(00000003)
 depth=2 C = US, O = DigiCert Inc, OU = www.digicert.com, CN = DigiCert Global Root CA
 verify error:num=19:self signed certificate in certificate chain
@@ -699,18 +702,18 @@ Certificate chain
    i:/C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert Global Root CA
 ...
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;We can see the server including the OCSP response in the TLS handshake.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="haproxy" /><category term="ocsp" /><summary>The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</summary></entry><entry><title>Nginx LDAP module on Debian/Ubuntu</title><link href="http://icicimov.github.io/Nginx-LDAP-module/" rel="alternate" type="text/html" title="Nginx LDAP module on Debian/Ubuntu" /><published>2014-09-02T00:00:00+10:00</published><updated>2014-09-02T00:00:00+10:00</updated><id>http://icicimov.github.io/Nginx-LDAP-module</id><content type="html" xml:base="http://icicimov.github.io/Nginx-LDAP-module/">&lt;p&gt;&lt;a href=&quot;www.nginx.com&quot;&gt;Nginx&lt;/a&gt; by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.&lt;/p&gt;
+&lt;p&gt;We can see the server including the OCSP response in the TLS handshake.&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="haproxy" /><category term="ocsp" /><summary type="html">The Online Certificate Status Protocol (OCSP) is an Internet protocol used for obtaining the revocation status of an X.509 digital certificate.  It is used by https clients (browsers) to confirm that the certificate sent by the server they have connected to is a valid one. Every time the client connects to a server it needs to contact the server&amp;#39;s CA OCSP responder and check the validity of its certificate. An OCSP responder (a server typically run by the certificate issuer) may return a signed response signifying that the certificate specified in the request is &amp;#39;good&amp;#39;, &amp;#39;revoked&amp;#39;, or &amp;#39;unknown&amp;#39;. If it cannot process the request, it may return an error code. It has several benefits over Certificate Revocation List (CRL) since an OCSP response contains less information and does not need to be parsed.</summary></entry><entry><title type="html">Nginx LDAP module on Debian/Ubuntu</title><link href="http://icicimov.github.io/Nginx-LDAP-module/" rel="alternate" type="text/html" title="Nginx LDAP module on Debian/Ubuntu" /><published>2014-09-02T00:00:00+10:00</published><updated>2014-09-02T00:00:00+10:00</updated><id>http://icicimov.github.io/Nginx-LDAP-module</id><content type="html" xml:base="http://icicimov.github.io/Nginx-LDAP-module/">&lt;p&gt;&lt;a href=&quot;www.nginx.com&quot;&gt;Nginx&lt;/a&gt; by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.&lt;/p&gt;
 
 &lt;h2&gt;Installation&lt;/h2&gt;
 
 &lt;p&gt;First we need the OpenLDAP development headers so the module can build properly. On Ubuntu-12.04 (Precise) we run:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# aptitude install libldap2-dev
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:~# aptitude install libldap2-dev
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Then we switch to our Nginx source directory we have created in this article Centralized logs collection with Logstash and clone the Nginx ldap module inside the modules directory from its project site on GitHub:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# cd /tmp/nginx-1.6.0
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:~# cd /tmp/nginx-1.6.0
 root@server:/tmp/nginx-1.6.0# cd debian/modules
 root@server:/tmp/nginx-1.6.0/debian/modules# git clone https://github.com/kvspb/nginx-auth-ldap.git
-Cloning into &amp;#39;nginx-auth-ldap&amp;#39;...
+Cloning into 'nginx-auth-ldap'...
 remote: Counting objects: 196, done.
 remote: Total 196 (delta 0), reused 0 (delta 0)
 Receiving objects: 100% (196/196), 77.58 KiB | 102.00 KiB/s, done.
@@ -718,7 +721,7 @@ Resolving deltas: 100% (101/101), done.
 Checking connectivity... done.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Then we edit the rules file and add the new module to the build command:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0/debian/modules# cd ../../
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0/debian/modules# cd ../../
 root@server:/tmp/nginx-1.6.0# vi debian/rules
 ...
 naxsi_configure_flags := \
@@ -734,19 +737,19 @@ naxsi_configure_flags := \
                         --add-module=$(MODULESDIR)/nginx-auth-ldap
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Next we change the Nginx version in the changelog file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# vi debian/changelog
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0# vi debian/changelog
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;change the first line:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;nginx (1.6.0-1+precise0) precise; urgency=medium
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;nginx (1.6.0-1+precise0) precise; urgency=medium
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;to:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;nginx (1.6.0-1+precise0-ldap) precise; urgency=medium
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;nginx (1.6.0-1+precise0-ldap) precise; urgency=medium
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and start the building process:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg-buildpackage -uc -b
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg-buildpackage -uc -b
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;When finished we will see all the deb packages created in the directory one level above:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:~# ls -l /tmp/*.deb
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:~# ls -l /tmp/*.deb
 -rw-r--r-- 1 root root   19818 Aug 27 19:14 /tmp/nginx_1.6.0-1+precise0-ldap_all.deb
 -rw-r--r-- 1 root root   34086 Aug 27 19:14 /tmp/nginx-common_1.6.0-1+precise0-ldap_all.deb
 -rw-r--r-- 1 root root   31756 Aug 27 19:14 /tmp/nginx-doc_1.6.0-1+precise0-ldap_all.deb
@@ -761,21 +764,21 @@ naxsi_configure_flags := \
 -rw-r--r-- 1 root root  308594 Aug 27 19:14 /tmp/nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;I install the nginx-naxsi packages only since that&amp;#39;s the Nginx version I&amp;#39;m are running:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg -i nginx-common_1.6.0-1+precise0-ldap_all.deb nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0# dpkg -i nginx-common_1.6.0-1+precise0-ldap_all.deb nginx-naxsi_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-dbg_1.6.0-1+precise0-ldap_amd64.deb nginx-naxsi-ui_1.6.0-1+precise0-ldap_all.deb
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;and restart Nginx process:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# service nginx restart
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0# service nginx restart
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;After that we can check the Nginx version information to confirm it compiled with LDAP support:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;root@server:/tmp/nginx-1.6.0# nginx -V
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;root@server:/tmp/nginx-1.6.0# nginx -V
 nginx version: nginx/1.6.0
 TLS SNI support enabled
-configure arguments: --with-cc-opt=&amp;#39;-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2&amp;#39; --with-ld-opt=&amp;#39;-Wl,-Bsymbolic-functions -Wl,-z,relro&amp;#39; --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --without-mail_pop3_module --without-mail_smtp_module --without-mail_imap_module --without-http_uwsgi_module --without-http_scgi_module --add-module=/tmp/nginx-1.6.0/debian/modules/naxsi/naxsi_src --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-cache-purge --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-upstream-fair --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-auth-ldap
+configure arguments: --with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2' --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-debug --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --without-mail_pop3_module --without-mail_smtp_module --without-mail_imap_module --without-http_uwsgi_module --without-http_scgi_module --add-module=/tmp/nginx-1.6.0/debian/modules/naxsi/naxsi_src --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-cache-purge --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-upstream-fair --add-module=/tmp/nginx-1.6.0/debian/modules/nginx-auth-ldap
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h2&gt;Configuration&lt;/h2&gt;
 
 &lt;p&gt;We add to Nginx config file &lt;code&gt;/etc/nginx/nginx.conf&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;http {
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;http {
   ...
   auth_ldap_cache_enabled on;
   auth_ldap_cache_expiration_time 10000;
@@ -783,28 +786,28 @@ configure arguments: --with-cc-opt=&amp;#39;-g -O2 -fstack-protector --param=ssp
 
   ldap_server ldap1 {
     url ldap://ldap1.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
-    binddn &amp;quot;cn=binduser,ou=Users,dc=mydomain,dc=com&amp;quot;;
+    binddn &quot;cn=binduser,ou=Users,dc=mydomain,dc=com&quot;;
     binddn_passwd bindpassword;
     group_attribute memberUid;
     group_attribute_is_dn on;
-    require group &amp;quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&amp;quot;;
+    require group &quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&quot;;
     require valid_user;
   }
 
   ldap_server ldap2 {
     url ldap://ldap2.mydomain.com:389/ou=Users,dc=mydomain,dc=com?uid?sub;
-    binddn &amp;quot;cn=binduser,ou=Users,dc=mydomain,dc=com&amp;quot;;
+    binddn &quot;cn=binduser,ou=Users,dc=mydomain,dc=com&quot;;
     binddn_passwd bindpassword;
     group_attribute memberUid;
     group_attribute_is_dn on;
-    require group &amp;quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&amp;quot;;
+    require group &quot;cn=mygroup,ou=Groups,dc=mydomain,dc=com&quot;;
     require valid_user;
   }
   ...
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Then we use this in the virtual hosts or locations we want to protect like for example our server virtual host, in this case I have site &lt;code&gt;server&lt;/code&gt; active so I put in the &lt;code&gt;/etc/nginx/sites-enabled/server&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;server {
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;server {
     listen              443 ssl;
     server_name         server.mydomain.com www.server.mydomain.com;
     root                /opt/server/webapp/content;
@@ -820,11 +823,11 @@ configure arguments: --with-cc-opt=&amp;#39;-g -O2 -fstack-protector --param=ssp
         proxy_connect_timeout 10;
         proxy_read_timeout 10;
         proxy_pass   http://127.0.0.1:8080;
-        auth_ldap &amp;quot;My server access&amp;quot;;
+        auth_ldap &quot;My server access&quot;;
         auth_ldap_servers ldap1;
         auth_ldap_servers ldap2;
     }
 ...
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The only drawback is that the module still doesn&amp;#39;t support STARTTLS but supports SSL so in case we really need encrypted traffic (outside an internal LAN for example) we need to edit the config to use &lt;code&gt;ldaps&lt;/code&gt; on port &lt;code&gt;636&lt;/code&gt; (assuming our LDAP server has been configured with SSL support).&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="nginx" /><category term="ldap" /><summary>Nginx by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.</summary></entry></feed>
+&lt;p&gt;The only drawback is that the module still doesn&amp;#39;t support STARTTLS but supports SSL so in case we really need encrypted traffic (outside an internal LAN for example) we need to edit the config to use &lt;code&gt;ldaps&lt;/code&gt; on port &lt;code&gt;636&lt;/code&gt; (assuming our LDAP server has been configured with SSL support).&lt;/p&gt;</content><author><name>Igor Cicimov</name><email>igorc@encompasscorporation.com</email></author><category term="Server" /><category term="nginx" /><category term="ldap" /><summary type="html">Nginx by default contains the core modules needed which makes it light and lean web server. Any additional stuff needed have to be recompiled and added as modules since Nginx doesn&amp;#39;t have a dynamic (plug-able) module infrastructure like Apache for example.</summary></entry></feed>

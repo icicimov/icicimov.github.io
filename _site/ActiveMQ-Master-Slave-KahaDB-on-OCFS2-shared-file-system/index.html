@@ -4,39 +4,60 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system – Igor Cicimov – DevOps at Encompass</title>
 
-        <meta charset="utf-8" />
-    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+        <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     
     <meta name="description" content="During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the Apache project site:
-" />
+">
     <meta property="og:description" content="During my tests of shared storage clusters I wondered if ActiveMQ supports file locking on OCFS2 file system which I used on couple of occasions. While looking into it I came accross the following warning on the Apache project site:
-" />
+">
     
-    <meta name="author" content="Igor Cicimov" />
+    <meta name="author" content="Igor Cicimov">
 
     
-    <meta property="og:title" content="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" />
-    <meta property="twitter:title" content="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system" />
+    <meta property="og:title" content="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system">
+    <meta property="twitter:title" content="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system">
     
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml">
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.0.0 -->
+<title>ActiveMQ Master/Slave KahaDB on OCFS2 shared file system - Igor Cicimov</title>
+<meta property="og:title" content="ActiveMQ Master/Slave KahaDB on OCFS2 shared file system">
+<meta name="description" content="Activemq locks with OCFS2">
+<meta property="og:description" content="Activemq locks with OCFS2">
+<link rel="canonical" href="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">
+<meta property="og:url" content="http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/">
+<meta property="og:site_name" content="Igor Cicimov">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2016-03-18T00:00:00+11:00">
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "ActiveMQ Master/Slave KahaDB on OCFS2 shared file system",
+    "datePublished": "2016-03-18T00:00:00+11:00",
+    "description": "Activemq locks with OCFS2",
+    "url": "http://icicimov.github.io/ActiveMQ-Master-Slave-KahaDB-on-OCFS2-shared-file-system/"
+  }
+</script>
+<!-- End Jekyll SEO tag -->
   </head>
 
   <body>
     <div class="wrapper-masthead">
       <div class="container">
         <header class="masthead clearfix">
-          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png"></a>
 
           <div class="site-info">
             <h1 class="site-name"><a href="/">Igor Cicimov</a></h1>
@@ -61,7 +82,7 @@
 <blockquote>
 <p><strong>OCFS2 Warning</strong></p>
 
-<p>Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with <code>fcntl</code> and not <code>lockf and flock</code>, therefore mutex file locking from Java isn&#39;t supported.</p>
+<p>Was testing using OCFS2 and both brokers thought they had the master lock - this is because OCFS2 only supports locking with <code>fcntl</code> and not <code>lockf and flock</code>, therefore mutex file locking from Java isn't supported.</p>
 </blockquote>
 
 <p>From <a href="http://sources.redhat.com/cluster/faq.html#gfs_vs_ocfs2">RedHat faq</a> :</p>
@@ -77,13 +98,13 @@
 <p>And true enough, when tested ActiveMQ-5.11.1 on one of the OCFS2 clusters, what happened is that both servers started as master due to lack of lock file on the share. Investigating further it came up that some good man created a patch that Apache never bothered to apply from some unknown reason. The case link <a href="https://issues.apache.org/jira/browse/AMQ-4694">AMQ-4694</a>. The patch was attached to the ticket so thought I would try it and apply to latest 5.11.4 version.</p>
 
 <p>Downloaded the source:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~# aptitude install zip
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~# aptitude install zip
 root@drbd01:~# wget http://mirror.ventraip.net.au/apache/activemq/5.11.4/activemq-parent-5.11.4-source-release.zip
 root@drbd01:~# unzip activemq-parent-5.11.4-source-release.zip
 root@drbd01:~# cd activemq-parent-5.11.4/
 </code></pre></div>
 <p>and applied the patch:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~/activemq-parent-5.11.4# vi ocfs2-locks.patch
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~/activemq-parent-5.11.4# vi ocfs2-locks.patch
 root@drbd01:~/activemq-parent-5.11.4# patch -p0 -i ocfs2-locks.patch
 patching file NOTICE
 Hunk #1 succeeded at 45 with fuzz 2 (offset -4 lines).
@@ -105,19 +126,19 @@ patching file pom.xml
 Hunk #1 succeeded at 881 with fuzz 1 (offset 44 lines).
 </code></pre></div>
 <p>Ok, so all good except it failed for the SharedFileLocker.java file. Easily fixed by applying that part of the patch manually:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~/activemq-parent-5.11.4# vi activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~/activemq-parent-5.11.4# vi activemq-broker/src/main/java/org/apache/activemq/store/SharedFileLocker.java
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the &quot;License&quot;); you may not use this file except in compliance with
+ * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -131,7 +152,7 @@ import org.apache.activemq.util.LockResource;
 /**
  * An {@link AbstractResourceLocker} that utilizes a {@link LockFile}.
  *
- * @org.apache.xbean.XBean element=&quot;shared-file-locker&quot;
+ * @org.apache.xbean.XBean element="shared-file-locker"
  *
  */
 public class SharedFileLocker extends AbstractResourceLocker {
@@ -143,39 +164,39 @@ public class SharedFileLocker extends AbstractResourceLocker {
 }
 </code></pre></div>
 <p>Next installed Maven:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~# wget http://apache.uberglobalmirror.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~# wget http://apache.uberglobalmirror.com/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
 root@drbd01:~# tar -xzvf apache-maven-3.3.9-bin.tar.gz
 root@drbd01:~# mv apache-maven-3.3.9 /usr/local/
 root@drbd01:~# export PATH=/usr/local/apache-maven-3.3.9/bin:$PATH
 </code></pre></div>
 <p>Back to AMQ directory and build the project:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~/activemq-parent-5.11.4# mvn -Dtest=false -DfailIfNoTests=false clean install -e -X
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~/activemq-parent-5.11.4# mvn -Dtest=false -DfailIfNoTests=false clean install -e -X
 </code></pre></div>
 <p>Install the built binaries:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:~# tar -xzvf /root/.m2/repository/org/apache/activemq/apache-activemq/5.11.4/apache-activemq-5.11.4-bin.tar.gz -C /opt/
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:~# tar -xzvf /root/.m2/repository/org/apache/activemq/apache-activemq/5.11.4/apache-activemq-5.11.4-bin.tar.gz -C /opt/
 </code></pre></div>
 <p>and copy the setup from the previous AMQ version into the new one:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:/opt# cp -a apache-activemq-5.11.1/conf/{log4j.properties,jmx.access,jmx.password,jetty.xml,encompass-activemq.xml,star_encompasshost_com.jks} apache-activemq-5.11.4/conf/
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:/opt# cp -a apache-activemq-5.11.1/conf/{log4j.properties,jmx.access,jmx.password,jetty.xml,encompass-activemq.xml,star_encompasshost_com.jks} apache-activemq-5.11.4/conf/
 root@drbd01:/opt# chown -R activemq\: apache-activemq-5.11.4
 root@drbd01:/opt# rm activemq
 root@drbd01:/opt# ln -s apache-activemq-5.11.4 activemq
 </code></pre></div>
 <p>The last bit is modifying the KahaDB locker to use the newly introduced shared-native-file-locker one:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:/opt# vi activemq/conf/activemq.xml
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:/opt# vi activemq/conf/activemq.xml
 [...]
     &lt;persistenceAdapter&gt;
-        &lt;kahaDB directory=&quot;/share/activemq-data&quot;
-               indexCacheSize=&quot;40000&quot;
-               checkForCorruptJournalFiles=&quot;true&quot;&gt;
+        &lt;kahaDB directory="/share/activemq-data"
+               indexCacheSize="40000"
+               checkForCorruptJournalFiles="true"&gt;
                &lt;locker&gt;
-                  &lt;shared-native-file-locker lockAcquireSleepInterval=&quot;5000&quot;/&gt;
+                  &lt;shared-native-file-locker lockAcquireSleepInterval="5000"/&gt;
                &lt;/locker&gt;
          &lt;/kahaDB&gt;
     &lt;/persistenceAdapter&gt;
 [...]
 </code></pre></div>
 <p>After copying over the binary tarball to the other server, installing and performing the above steps, I started the server and the lock file was indeed created this time:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd01:/opt# ls -ltr /share/activemq-data/
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd01:/opt# ls -ltr /share/activemq-data/
 total 160
 drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 -rw-r--r-- 1 root     root            5 Mar 17 15:30 test
@@ -185,7 +206,7 @@ drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 -rw-r--r-- 1 activemq activemq    12288 Mar 17 18:17 db.data
 </code></pre></div>
 <p>and the other server can see it:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@drbd02:/opt# start activemq &amp;&amp; tail -f /opt/activemq/data/activemq.log | grep -i lock
+<div class="highlight"><pre><code class="language-" data-lang="">root@drbd02:/opt# start activemq &amp;&amp; tail -f /opt/activemq/data/activemq.log | grep -i lock
 2016-03-18 10:00:15,375 | INFO  | Database /share/activemq-data/lock is locked... waiting 5 seconds for the database to be unlocked. Reason: java.io.IOException: failed to acquire lock: [11] ( | org.apache.activemq.store.SharedNativeFileLocker | main
 ...
 </code></pre></div>
@@ -209,7 +230,8 @@ drwxr-xr-x 3 activemq activemq     3896 Mar 17 15:27 com.broker.name
 	    })();
 
 	</script>
-	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 </div>
 
 </article>

@@ -25,6 +25,24 @@
     <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.0.0 -->
+<title>Igor Cicimov - DevOps at Encompass</title>
+<meta property="og:title" content="Igor Cicimov" />
+<meta name="description" content="DevOps at Encompass" />
+<meta property="og:description" content="DevOps at Encompass" />
+<link rel="canonical" href="http://icicimov.github.io/.bkp" />
+<meta property="og:url" content="http://icicimov.github.io/.bkp" />
+<meta property="og:site_name" content="Igor Cicimov" />
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "headline": "Igor Cicimov",
+    "description": "DevOps at Encompass",
+    "url": "http://icicimov.github.io/.bkp"
+  }
+</script>
+<!-- End Jekyll SEO tag -->
   </head>
 
   <body>

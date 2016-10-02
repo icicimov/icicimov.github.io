@@ -4,39 +4,60 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <title>HAProxy dynamically adjust server weight using external agent – Igor Cicimov – DevOps at Encompass</title>
 
-        <meta charset="utf-8" />
-    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+        <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     
     <meta name="description" content="Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
-" />
+">
     <meta property="og:description" content="Trying to utilize HAProxy-1.5/1.6 agent-check feature, see HAProxy documentation, I wrote this small script to check Tomcat system load and return back some values that HAP can use to dynamically adjust the server weight in the backend.
-" />
+">
     
-    <meta name="author" content="Igor Cicimov" />
+    <meta name="author" content="Igor Cicimov">
 
     
-    <meta property="og:title" content="HAProxy dynamically adjust server weight using external agent" />
-    <meta property="twitter:title" content="HAProxy dynamically adjust server weight using external agent" />
+    <meta property="og:title" content="HAProxy dynamically adjust server weight using external agent">
+    <meta property="twitter:title" content="HAProxy dynamically adjust server weight using external agent">
     
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml">
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.0.0 -->
+<title>HAProxy dynamically adjust server weight using external agent - Igor Cicimov</title>
+<meta property="og:title" content="HAProxy dynamically adjust server weight using external agent">
+<meta name="description" content="Dynamically adjust server weight using external agent in HAProxy">
+<meta property="og:description" content="Dynamically adjust server weight using external agent in HAProxy">
+<link rel="canonical" href="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
+<meta property="og:url" content="http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/">
+<meta property="og:site_name" content="Igor Cicimov">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2015-10-13T00:00:00+11:00">
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "HAProxy dynamically adjust server weight using external agent",
+    "datePublished": "2015-10-13T00:00:00+11:00",
+    "description": "Dynamically adjust server weight using external agent in HAProxy",
+    "url": "http://icicimov.github.io/HAProxy-dynamically-adjust-server-weight-using-external-agent/"
+  }
+</script>
+<!-- End Jekyll SEO tag -->
   </head>
 
   <body>
     <div class="wrapper-masthead">
       <div class="container">
         <header class="masthead clearfix">
-          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png"></a>
 
           <div class="site-info">
             <h1 class="site-name"><a href="/">Igor Cicimov</a></h1>
@@ -60,7 +81,7 @@
 
 <p>This will run as xinetd service on the Tomcats, for example made available to HAP on port 9707 (some randomly chosen free port).</p>
 
-<p>Explanation how is this going to work. Each server starts with weight of 100. This health check will run every 5 minutes lets say (the primary runs every 10 seconds) and the agent will return &quot;up&quot; plus weight value or &quot;down&quot; upon heath check. The weight percentage returned is calculated based on the system load in the last 5 minutes (can be 1 or 15 min. too), ie if load is below 90% it will return weight of 100, between 90% and 100% it will reduce the weight to 50% (meaning HAP will send only 25% of the connections to this server in case of 2 servers) and if 100% it will mark this server down.</p>
+<p>Explanation how is this going to work. Each server starts with weight of 100. This health check will run every 5 minutes lets say (the primary runs every 10 seconds) and the agent will return "up" plus weight value or "down" upon heath check. The weight percentage returned is calculated based on the system load in the last 5 minutes (can be 1 or 15 min. too), ie if load is below 90% it will return weight of 100, between 90% and 100% it will reduce the weight to 50% (meaning HAP will send only 25% of the connections to this server in case of 2 servers) and if 100% it will mark this server down.</p>
 
 <p>This additional, lets call it secondary, heath check will work in conjunction with the already existing one, which only checks if the service is up or down, and provide flexibility in terms of backend load.</p>
 
@@ -72,31 +93,31 @@
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/bin/bash</span>
 <span class="nv">LMAX</span><span class="o">=</span>90
 
-<span class="nv">load</span><span class="o">=</span><span class="k">$(</span>uptime <span class="p">|</span> grep -E -o <span class="s1">&#39;load average[s:][: ].*&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/,//g&#39;</span> <span class="p">|</span> cut -d<span class="s1">&#39; &#39;</span> -f3-5<span class="k">)</span>
-<span class="nv">cpus</span><span class="o">=</span><span class="k">$(</span>grep processor /proc/cpuinfo <span class="p">|</span> wc -l<span class="k">)</span>
+<span class="nv">load</span><span class="o">=</span><span class="k">$(</span>uptime | grep -E -o <span class="s1">'load average[s:][: ].*'</span> | sed <span class="s1">'s/,//g'</span> | cut -d<span class="s1">' '</span> -f3-5<span class="k">)</span>
+<span class="nv">cpus</span><span class="o">=</span><span class="k">$(</span>grep processor /proc/cpuinfo | wc -l<span class="k">)</span>
 
-<span class="k">while</span> <span class="nb">read</span> -r l1 l5 l15<span class="p">;</span> <span class="k">do</span> <span class="o">{</span>
-    <span class="nv">l5util</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&quot;$l5/$cpus*100&quot;</span> <span class="p">|</span> bc -l <span class="p">|</span> cut -d<span class="s2">&quot;.&quot;</span> -f1<span class="k">)</span><span class="p">;</span>
-    <span class="o">[[</span> <span class="nv">$l5util</span> -lt <span class="nv">$LMAX</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;up 100%&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0<span class="p">;</span>
-    <span class="o">[[</span> <span class="nv">$l5util</span> -gt <span class="nv">$LMAX</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="nv">$l5util</span> -lt <span class="m">100</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;up 50%&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0<span class="p">;</span>
-    <span class="nb">echo</span> <span class="s2">&quot;down#CPU overload&quot;</span><span class="p">;</span>
-<span class="o">}</span><span class="p">;</span> <span class="k">done</span> &lt; &lt;<span class="o">(</span><span class="nb">echo</span> <span class="nv">$load</span><span class="o">)</span>
+<span class="k">while </span><span class="nb">read</span> -r l1 l5 l15; <span class="k">do</span> <span class="o">{</span>
+    <span class="nv">l5util</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$l5</span><span class="s2">/</span><span class="nv">$cpus</span><span class="s2">*100"</span> | bc -l | cut -d<span class="s2">"."</span> -f1<span class="k">)</span>;
+    <span class="o">[[</span> <span class="nv">$l5util</span> -lt <span class="nv">$LMAX</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"up 100%"</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0;
+    <span class="o">[[</span> <span class="nv">$l5util</span> -gt <span class="nv">$LMAX</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="o">[[</span> <span class="nv">$l5util</span> -lt 100 <span class="o">]]</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"up 50%"</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0;
+    <span class="nb">echo</span> <span class="s2">"down#CPU overload"</span>;
+<span class="o">}</span>; <span class="k">done</span> &lt; &lt;<span class="o">(</span><span class="nb">echo</span> <span class="nv">$load</span><span class="o">)</span>
 
 <span class="nb">exit </span>0
 </code></pre></div>
 <p>Set it to be executable:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@app21:~# chmod +x /usr/local/bin/haproxy-agent-check
+<div class="highlight"><pre><code class="language-" data-lang="">root@app21:~# chmod +x /usr/local/bin/haproxy-agent-check
 </code></pre></div>
 <p>Next we set it as xinetd service, first install xinetd:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@app21:~# aptitude install -y xinetd
+<div class="highlight"><pre><code class="language-" data-lang="">root@app21:~# aptitude install -y xinetd
 </code></pre></div>
 <p>Then add our service to the system services in <code>/etc/services</code> file:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">...
+<div class="highlight"><pre><code class="language-" data-lang="">...
 haproxy-agent-check 9707/tcp                # haproxy-agent-check
 ...
 </code></pre></div>
 <p>Create the xinetd daemon file <code>/etc/xinetd.d/haproxy-agent-check</code>:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"># default: on
+<div class="highlight"><pre><code class="language-" data-lang=""># default: on
 # description: haproxy-agent-check
 service haproxy-agent-check
 {
@@ -113,40 +134,40 @@ service haproxy-agent-check
 }
 </code></pre></div>
 <p>To allow access from specific subnets instead of hosts we can use the following format:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">only_from       = 10.22.0.0 10.22.1.0 10.22.2.0 127.0.0.1
+<div class="highlight"><pre><code class="language-" data-lang="">only_from       = 10.22.0.0 10.22.1.0 10.22.2.0 127.0.0.1
 </code></pre></div>
 <p>Make it executable, restart xinetd and test:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@app21-hap:~# chmod +x /etc/xinetd.d/haproxy-agent-check
+<div class="highlight"><pre><code class="language-" data-lang="">root@app21-hap:~# chmod +x /etc/xinetd.d/haproxy-agent-check
 root@app21-:~# service xinetd restart
 root@app21:~# telnet 127.0.0.1 9707
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
-Escape character is &#39;^]&#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 </code></pre></div>
-<p>All looks good so we can setup the HAP&#39;s now.</p>
+<p>All looks good so we can setup the HAP's now.</p>
 
-<h1>On the HAProxy LB&#39;s</h1>
+<h1>On the HAProxy LB's</h1>
 
 <p>Open the TCP port 9707 in the APP servers firewall and Test the agent-check connectivity from HAP serers to the app servers:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@lb1:~# telnet ip-172-31-17-41 9707
+<div class="highlight"><pre><code class="language-" data-lang="">root@lb1:~# telnet ip-172-31-17-41 9707
 Trying 172.31.17.41...
 Connected to ip-172-31-17-41.ap-southeast-2.compute.internal.
-Escape character is &#39;^]&#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 
 root@lb1:~# telnet ip-172-31-11-41 9707
 Trying 172.31.11.41...
 Connected to ip-172-31-11-41.ap-southeast-2.compute.internal.
-Escape character is &#39;^]&#39;.
+Escape character is '^]'.
 up 100%
 Connection closed by foreign host.
 root@lb1:~#
 </code></pre></div>
 <p>Add <code>agent-check</code>, <code>agent-port</code> and <code>agent-inter</code> parameters to the backend servers in the <code>/etc/haproxy/haproxy.cfg</code> config file:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">...
+<div class="highlight"><pre><code class="language-" data-lang="">...
 listen https-in
 ...
     default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 200 maxqueue 250 weight 100 error-limit 10 on-error mark-down on-marked-down shutdown-sessions agent-port 9707 agent-inter 30s
@@ -155,7 +176,7 @@ listen https-in
     server localhost 127.0.0.1:8080 maxconn 500 backup weight 1
 </code></pre></div>
 <p>And reload HAP service. Check the health status:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">root@lb1:~# echo &quot;show stat&quot; | socat stdio unix-connect:/run/haproxy/admin.sock | cut -d &#39;,&#39; -f1,2,18,19 | grep https
+<div class="highlight"><pre><code class="language-" data-lang="">root@lb1:~# echo "show stat" | socat stdio unix-connect:/run/haproxy/admin.sock | cut -d ',' -f1,2,18,19 | grep https
 https-in,ip-172-31-17-41,UP,100
 https-in,ip-172-31-11-41,UP,100
 https-in,localhost,no check,1
@@ -183,7 +204,8 @@ https-in,BACKEND,UP,200
 	    })();
 
 	</script>
-	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 </div>
 
 </article>

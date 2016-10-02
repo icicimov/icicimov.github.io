@@ -4,39 +4,60 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2 – Igor Cicimov – DevOps at Encompass</title>
 
-        <meta charset="utf-8" />
-    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+        <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     
     <meta name="description" content="Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.
-" />
+">
     <meta property="og:description" content="Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.
-" />
+">
     
-    <meta name="author" content="Igor Cicimov" />
+    <meta name="author" content="Igor Cicimov">
 
     
-    <meta property="og:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" />
-    <meta property="twitter:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2" />
+    <meta property="og:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2">
+    <meta property="twitter:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2">
     
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml" />
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Igor Cicimov - DevOps at Encompass" href="/feed.xml">
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+    <!-- Begin Jekyll SEO tag v2.0.0 -->
+<title>Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2 - Igor Cicimov</title>
+<meta property="og:title" content="Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2">
+<meta name="description" content="Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.">
+<meta property="og:description" content="Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.">
+<link rel="canonical" href="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
+<meta property="og:url" content="http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/">
+<meta property="og:site_name" content="Igor Cicimov">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2016-04-04T00:00:00+10:00">
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Tomcat9, ECDSA/ECC (Elliptic Curve) Certificates and HTTP/2",
+    "datePublished": "2016-04-04T00:00:00+10:00",
+    "description": "Tomcat9 brings bunch of new features like support for HTTP/2 and multiple certificates per Virtual Host via SNI extension.",
+    "url": "http://icicimov.github.io/Tomcat9-ECDSA-Certificates-and-HTTP2/"
+  }
+</script>
+<!-- End Jekyll SEO tag -->
   </head>
 
   <body>
     <div class="wrapper-masthead">
       <div class="container">
         <header class="masthead clearfix">
-          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png"></a>
 
           <div class="site-info">
             <h1 class="site-name"><a href="/">Igor Cicimov</a></h1>
@@ -58,7 +79,7 @@
   <div class="entry">
     <p>Tomcat9 brings bunch of new features of which support for HTTP/2 and multiple certificates per Virtual Host via SNI extension are most important ones. This needs Java 1.8, the latest APR/TC (Tomcat Native) release 1.2.x, since SNI support in current Java 1.8 is useless, which in turn requires OpenSSL version 1.0.2g installed. Early users of HTTP/2, according to one of the main Tomcat developers Mark Thomas, reported improvement of up to 20% in page speed due to its benefits like multiplexing, header compression and server push (servlet 4.0 API needed). By default HTTP/2 (h2) protocol is SSL, as expected the whole internet to be over https only in near future, but there is a clear-text version as well called h2c.</p>
 
-<p>The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It&#39;s in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.</p>
+<p>The ECDSA certificates are smaller, meaning faster processing time on the server and less CPU usage which in term means less latency and more security. It's in the early day of adoption by the clients though so for some time we will need to support both certificate types, ECDSA and RSA.</p>
 
 <p>Nice things to have so I setup a test Tomcat9 server on Ubunut 14.04.</p>
 
@@ -69,15 +90,15 @@
 <h3>OpenSSL</h3>
 
 <p>Standard compile procedure, we start by installing some needed packages:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo aptitude install zlib1g-dev zlibc libcrypto++-dev
 </code></pre></div>
 <p>and then downloading and extracting the source:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo wget http://www.openssl.org/source/openssl-1.0.2g.tar.gz
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo wget http://www.openssl.org/source/openssl-1.0.2g.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf openssl-1.0.2g.tar.gz
 igorc@sl01:/opt$ sudo chown -R igorc\: openssl-1.0.2g
 </code></pre></div>
 <p>Next we change to the source directory and create the openssl.ld file:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ cd openssl-1.0.2g/
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ cd openssl-1.0.2g/
 igorc@sl01:~/openssl-1.0.2g$ vi openssl.ld
 OPENSSL_1.0.0 {
     global:
@@ -85,13 +106,13 @@ OPENSSL_1.0.0 {
 };
 </code></pre></div>
 <p>and finally compile and install the software:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt/openssl-1.0.2g$ ./config --prefix=/opt/openssl zlib-dynamic shared -Wl,--version-script=/home/igorc/openssl-1.0.2g/openssl.ld -Wl,-Bsymbolic-functions
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt/openssl-1.0.2g$ ./config --prefix=/opt/openssl zlib-dynamic shared -Wl,--version-script=/home/igorc/openssl-1.0.2g/openssl.ld -Wl,-Bsymbolic-functions
 igorc@sl01:/opt/openssl-1.0.2g$ make depend
 igorc@sl01:/opt/openssl-1.0.2g$ make all
 igorc@sl01:/opt/openssl-1.0.2g$ sudo make install
 </code></pre></div>
 <p>This will set OpenSSL 1.0.2g under /opt/openssl directory:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt/openssl-1.0.2g$ ls -l /opt/openssl
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt/openssl-1.0.2g$ ls -l /opt/openssl
 total 16
 drwxr-xr-x 2 root root 4096 Apr  2 19:18 bin
 drwxr-xr-x 3 root root 4096 Apr  2 19:18 include
@@ -101,7 +122,7 @@ drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
 <h3>Java8</h3>
 
 <p>One liner installation:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;&amp; echo &quot;deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&quot; | sudo tee -a /etc/apt/sources.list &amp;&amp; echo &quot;deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main&quot; | sudo tee -a /etc/apt/sources.list &amp;&amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;&amp; sudo aptitude update &amp;&amp; sudo aptitude install -y oracle-java8-installer &amp;&amp; sudo aptitude install -y oracle-java8-set-default
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &amp;&amp; echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list &amp;&amp; echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list &amp;&amp; sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 &amp;&amp; sudo aptitude update &amp;&amp; sudo aptitude install -y oracle-java8-installer &amp;&amp; sudo aptitude install -y oracle-java8-set-default
 </code></pre></div>
 <p>This will add the needed Ubuntu ppa, install the latest Oracle 1.8 JDK and set it as default Java environment.</p>
 
@@ -110,8 +131,8 @@ drwxr-xr-x 6 root root 4096 Apr  2 19:18 ssl
 <h4>Installation</h4>
 
 <p>Get and unpack the latest Tomcat9 release, alfa version v9.0.0.M4 at the moment of this writing, and setup tomcat user:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
-igorc@sl01:/opt$ sudo useradd -r -c &quot;Tomcat9 user&quot; -s /bin/false -M -d /usr/share/tomcat9 -g 501 -u 501 -G www-data tomcat9
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo groupadd -r -g 501 tomcat9
+igorc@sl01:/opt$ sudo useradd -r -c "Tomcat9 user" -s /bin/false -M -d /usr/share/tomcat9 -g 501 -u 501 -G www-data tomcat9
 igorc@sl01:/opt$ sudo wget http://apache.uberglobalmirror.com/tomcat/tomcat-9/v9.0.0.M4/bin/apache-tomcat-9.0.0.M4.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf apache-tomcat-9.0.0.M4.tar.gz
 igorc@sl01:/opt$ sudo mv apache-tomcat-9.0.0.M4 /usr/share/tomcat9
@@ -122,10 +143,10 @@ igorc@sl01:/opt$ sudo ln -sf /usr/share/tomcat9/conf /etc/tomcat9
 <h4>TC-Native</h4>
 
 <p>We install the needed packages first:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo aptitude install libapr1-dev libssl-dev
 </code></pre></div>
 <p>and then we download and etract the tcnative source, xtract and build it against oopenssl-1.0.2g we installed previously:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo wget http://apache.mirror.digitalpacific.com.au/tomcat/tomcat-connectors/native/1.2.5/source/tomcat-native-1.2.5-src.tar.gz
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo wget http://apache.mirror.digitalpacific.com.au/tomcat/tomcat-connectors/native/1.2.5/source/tomcat-native-1.2.5-src.tar.gz
 igorc@sl01:/opt$ sudo tar -xzf tomcat-native-1.2.5-src.tar.gz
 igorc@sl01:/opt$ cd tomcat-native-1.2.5-src/native
 igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ./configure --prefix=/usr --libdir=/usr/lib --with-apr=/usr/bin/apr-1-config --with-java-home=/usr/lib/jvm/java-8-oracle --with-ssl=/opt/openssl
@@ -133,7 +154,7 @@ igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ make
 igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ sudo make install
 </code></pre></div>
 <p>We check that tcnative is properly linked to the right openssl version (in case you have more than one installed):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ldd /usr/lib/libtcnative-1.so.0.2.5
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt/tomcat-native-1.2.5-src/native$ ldd /usr/lib/libtcnative-1.so.0.2.5
 linux-vdso.so.1 =&gt;  (0x00007ffcd2ba5000)
 libssl.so.1.0.0 =&gt; /opt/openssl/lib/libssl.so.1.0.0 (0x00007f67d06a1000)
 libcrypto.so.1.0.0 =&gt; /opt/openssl/lib/libcrypto.so.1.0.0 (0x00007f67d0251000)
@@ -148,40 +169,40 @@ libuuid.so.1 =&gt; /lib/x86_64-linux-gnu/libuuid.so.1 (0x00007f67cf41b000)
 <h4>Config and SSL setup</h4>
 
 <p>I wanted to test the ECDSA certificate type and multi-certificate support in tomcat9. First create ECC cert and install it so tomcat can find it:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj &#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&#39;
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ openssl req -new -x509 -nodes -newkey ec:&lt;(openssl ecparam -name secp384r1) -keyout cert_ecdsa.key -out cert_ecdsa.crt -days 7200 -subj '/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com'
 igorc@sl01:~$ sudo mkdir /etc/tomcat9/ssl
 igorc@sl01:~$ sudo cp cert_ecdsa.key cert_ecdsa.crt /etc/tomcat9/ssl/
 </code></pre></div>
 <p>Then created a standard RSA one too:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ openssl genrsa -des3 -passout pass:x -out server.pass.key 2048
 igorc@sl01:~$ openssl rsa -passin pass:x -in server.pass.key -out server.key
 igorc@sl01:~$ rm server.pass.key
-igorc@sl01:~$ openssl req -new -key server.key -out server.csr -subj &#39;/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com&#39;
+igorc@sl01:~$ openssl req -new -key server.key -out server.csr -subj '/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com'
 igorc@sl01:~$ openssl x509 -req -days 7200 -in server.csr -signkey server.key -out server.crt
 Signature ok
 subject=/C=AU/ST=New South Wales/L=Sydney/O=My Corporation Ltd./OU=DevOps/CN=tomcat9.mydomain.com
 Getting Private key
 igorc@sl01:~$ sudo cp server.key server.crt /etc/tomcat9/ssl/
 </code></pre></div>
-<p>Now we can configure tomcat9&#39;s SSL/TLS connector with HTTP/2 support. Replace the default <code>&lt;Connector&gt;</code> section in the tomcat&#39;s server.xml file, in our case <code>/etc/tomcat9/server.xml</code>, with the one below:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">    &lt;Connector port=&quot;8443&quot; protocol=&quot;org.apache.coyote.http11.Http11AprProtocol&quot;
-               maxThreads=&quot;150&quot; SSLEnabled=&quot;true&quot; scheme=&quot;https&quot; secure=&quot;true&quot; &gt;
-        &lt;UpgradeProtocol className=&quot;org.apache.coyote.http2.Http2Protocol&quot; /&gt;
-        &lt;SSLHostConfig honorCipherOrder=&quot;true&quot; disableCompression=&quot;true&quot; protocols=&quot;all&quot;
-                       ciphers=&quot;EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384
+<p>Now we can configure tomcat9's SSL/TLS connector with HTTP/2 support. Replace the default <code>&lt;Connector&gt;</code> section in the tomcat's server.xml file, in our case <code>/etc/tomcat9/server.xml</code>, with the one below:</p>
+<div class="highlight"><pre><code class="language-" data-lang="">    &lt;Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
+               maxThreads="150" SSLEnabled="true" scheme="https" secure="true" &gt;
+        &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt;
+        &lt;SSLHostConfig honorCipherOrder="true" disableCompression="true" protocols="all"
+                       ciphers="EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384
                        EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4
-                       EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4&quot; &gt;
-            &lt;Certificate certificateKeyFile=&quot;conf/ssl/cert_ecdsa.key&quot;
-                         certificateFile=&quot;conf/ssl/cert_ecdsa.crt&quot;
-                         type=&quot;EC&quot; /&gt;
-            &lt;Certificate certificateKeyFile=&quot;conf/ssl/server.key&quot;
-                         certificateFile=&quot;conf/ssl/server.crt&quot;
-                         type=&quot;RSA&quot; /&gt;
+                       EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4" &gt;
+            &lt;Certificate certificateKeyFile="conf/ssl/cert_ecdsa.key"
+                         certificateFile="conf/ssl/cert_ecdsa.crt"
+                         type="EC" /&gt;
+            &lt;Certificate certificateKeyFile="conf/ssl/server.key"
+                         certificateFile="conf/ssl/server.crt"
+                         type="RSA" /&gt;
         &lt;/SSLHostConfig&gt;
     &lt;/Connector&gt;
 </code></pre></div>
 <p>Now we can start the server:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo /usr/share/tomcat9/bin/startup.sh
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo /usr/share/tomcat9/bin/startup.sh
 Using CATALINA_BASE:   /usr/share/tomcat9
 Using CATALINA_HOME:   /usr/share/tomcat9
 Using CATALINA_TMPDIR: /usr/share/tomcat9/temp
@@ -190,11 +211,11 @@ Using CLASSPATH:       /usr/share/tomcat9/bin/bootstrap.jar:/usr/share/tomcat9/b
 Tomcat started.
 </code></pre></div>
 <p>and check for the features we need in the log file:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:/opt$ sudo grep -E &quot;AprLifecycleListener|h2&quot; /var/log/tomcat9/catalina.out
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:/opt$ sudo grep -E "AprLifecycleListener|h2" /var/log/tomcat9/catalina.out
 02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded APR based Apache Tomcat Native library 1.2.5 using APR version 1.5.1.
 02-Apr-2016 20:29:05.875 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
 02-Apr-2016 20:29:05.881 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized (OpenSSL 1.0.2g  1 Mar 2016)
-02-Apr-2016 20:29:05.883 INFO [main] org.apache.coyote.http11.AbstractHttp11Protocol.configureUpgradeProtocol The [&quot;https-apr-8443&quot;] connector has been configured to support negotiation to [h2] via ALPN
+02-Apr-2016 20:29:05.883 INFO [main] org.apache.coyote.http11.AbstractHttp11Protocol.configureUpgradeProtocol The ["https-apr-8443"] connector has been configured to support negotiation to [h2] via ALPN
 </code></pre></div>
 <p>We can see the APR connector, the correct OpenSSL version and the h2 protocol available via ALPN (Application-Layer Protocol Negotiation).</p>
 
@@ -202,10 +223,10 @@ Tomcat started.
 
 <h3>CuRL</h3>
 
-<p>To test the server I used the trusted curl. It came up it was little bit painful to set it up due to lot of prerequisites but since I&#39;ve done it I might show it here as well. There are some other HTTP/2 testing tools available that you can use in case you have domain name registered with proper DNS resolution setup.</p>
+<p>To test the server I used the trusted curl. It came up it was little bit painful to set it up due to lot of prerequisites but since I've done it I might show it here as well. There are some other HTTP/2 testing tools available that you can use in case you have domain name registered with proper DNS resolution setup.</p>
 
 <p>First the SPDY (Google extension which is now becoming obsolete with http2) support:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ git clone https://github.com/tatsuhiro-t/spdylay.git
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ git clone https://github.com/tatsuhiro-t/spdylay.git
 igorc@sl01:~$ cd spdylay/
 igorc@sl01:~$ autoreconf -i
 igorc@sl01:~$ automake
@@ -223,12 +244,12 @@ igorc@sl01:~$ sudo ln -s /usr/local/lib/libspdylay.so.7.2.0 /lib/x86_64-linux-gn
 igorc@sl01:~$ sudo ldconfig
 </code></pre></div>
 <p>Next is nghhtp2:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ git clone https://github.com/nghttp2/nghttp2.git
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ git clone https://github.com/nghttp2/nghttp2.git
 igorc@sl01:~$ cd nghttp2
 igorc@sl01:~$ autoreconf -i
 igorc@sl01:~$ automake
 igorc@sl01:~$ autoconf
-igorc@sl01:~$ OPENSSL_CFLAGS=&quot;-I/opt/openssl/include&quot; OPENSSL_LIBS=&quot;-L/opt/openssl/lib -lssl -lcrypto -ldl&quot; ./configure PYTHON=/usr/bin/python3
+igorc@sl01:~$ OPENSSL_CFLAGS="-I/opt/openssl/include" OPENSSL_LIBS="-L/opt/openssl/lib -lssl -lcrypto -ldl" ./configure PYTHON=/usr/bin/python3
 igorc@sl01:~$ make
 igorc@sl01:~$ sudo make install
 igorc@sl01:~$ sudo updatedb
@@ -244,7 +265,7 @@ igorc@sl01:~$ sudo ln -s /usr/local/lib/libnghttp2.so.14.0.2 /lib/x86_64-linux-g
 igorc@sl01:~$ sudo ldconfig
 </code></pre></div>
 <p>Finally checking the versions installed:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ nghttp --version
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ nghttp --version
 nghttp nghttp2/1.10.0-DEV
 igorc@sl01:~$ nghttpx --version
 nghttpx nghttp2/1.10.0-DEV
@@ -254,6 +275,7 @@ igorc@sl01:~$ h2load --version
 h2load nghttp2/1.10.0-DEV
 
 We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):
+
 </code></pre></div>
 <p>$ sudo nghttpx \
     --frontend=*,443 \
@@ -263,22 +285,22 @@ We can use this tool as SSL proxy if needed (nothing to do with the test, just m
 ```</p>
 
 <p>Or turn it into service:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
+<div class="highlight"><pre><code class="language-" data-lang="">$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
 $ sudo service nghttpx restart
 </code></pre></div>
 <p>And finally CuRL:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ wget https://curl.haxx.se/download/curl-7.48.0.tar.gz
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ wget https://curl.haxx.se/download/curl-7.48.0.tar.gz
 igorc@sl01:~$ tar -xzf curl-7.48.0.tar.gz
 igorc@sl01:~$ cd curl-7.48.0/
 igorc@sl01:~$ PKG_CONFIG_LIBDIR=/opt/openssl/lib/pkgconfig/ ./configure --with-ssl=/opt/openssl --with-nghttp2=/usr/local
 igorc@sl01:~$ make &amp;&amp; sudo make install
 </code></pre></div>
 <p>Now we set the correct binary and library paths so curl can find them:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ export PATH=/opt/openssl/bin:/usr/local/bin:igorc@sl01:~$PATH
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ export PATH=/opt/openssl/bin:/usr/local/bin:igorc@sl01:~$PATH
 igorc@sl01:~$ export LD_LIBRARY_PATH=/opt/openssl/lib:igorc@sl01:~$LD_LIBRARY_PATH
 </code></pre></div>
 <p>Check the openssl and curl binaries and their features:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ openssl version
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ openssl version
 OpenSSL 1.0.2g  1 Mar 2016
 
 igorc@sl01:~$ curl --version
@@ -289,7 +311,7 @@ Features: IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP HTTP2 UnixSockets
 <p>From the above output we can confirm that curl has http2 support.</p>
 
 <p>With all this done we can run the test. I tested for both when we have only ECDSA/ECC certificate configured in tomcat, since I wanted to see this cert in action:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
 *   Trying 127.0.0.1...
 * Connected to localhost (127.0.0.1) port 8443 (#0)
 * ALPN, offering h2
@@ -351,7 +373,7 @@ Features: IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP HTTP2 UnixSockets
 igorc@sl01:~$
 </code></pre></div>
 <p>and when both cert types are configured as per our example above:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
+<div class="highlight"><pre><code class="language-" data-lang="">igorc@sl01:~$ curl --http2 -v -k -s -S -I https://localhost:8443/ -o /dev/null
 *   Trying 127.0.0.1...
 * Connected to localhost (127.0.0.1) port 8443 (#0)
 * ALPN, offering h2
@@ -444,7 +466,8 @@ igorc@sl01:~$
 	    })();
 
 	</script>
-	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
 </div>
 
 </article>
