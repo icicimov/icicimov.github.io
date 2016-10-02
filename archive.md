@@ -16,7 +16,7 @@ permalink: /archive/
        {% endif %}
        <li><a class="post-title" href="{{ post.url }}"><span>{{ post.date | date: "%B %-d, %Y" }}</span> - {{ post.title }}
             {% for tag in post.tags %}
-                <small><a class="post-tag codinfox-tag-mark" href="/tag/#{{ tag | slugify }}">{{ tag }}</a></small>
+                <a class="post-tag codinfox-tag-mark" href="/tag/#{{ tag | slugify }}">{{ tag }}</a>
             {% endfor %}
        </a></li>
        {% if forloop.last %}</ul>{% endif %}

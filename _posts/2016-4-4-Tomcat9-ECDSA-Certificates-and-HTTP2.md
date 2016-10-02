@@ -268,6 +268,7 @@ igorc@sl01:~$ nghttpd --version
 nghttpd nghttp2/1.10.0-DEV
 igorc@sl01:~$ h2load --version
 h2load nghttp2/1.10.0-DEV
+```
 
 We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):
 

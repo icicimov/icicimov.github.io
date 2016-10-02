@@ -273,17 +273,14 @@ igorc@sl01:~$ nghttpd --version
 nghttpd nghttp2/1.10.0-DEV
 igorc@sl01:~$ h2load --version
 h2load nghttp2/1.10.0-DEV
-
-We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):
-
 </code></pre></div>
-<p>$ sudo nghttpx \
+<p>We can use this tool as SSL proxy if needed (nothing to do with the test, just mentioning):</p>
+<div class="highlight"><pre><code class="language-" data-lang="">$ sudo nghttpx \
     --frontend=*,443 \
     --backend=localhost,8080 \
     --private-key-file=/path/to/key.key \
     --certificate-file=/path/to/cert.crt
-```</p>
-
+</code></pre></div>
 <p>Or turn it into service:</p>
 <div class="highlight"><pre><code class="language-" data-lang="">$ sudo cp ~/nghttp2/contrib/nghttpx-init /etc/init.d/nghttpx
 $ sudo service nghttpx restart
