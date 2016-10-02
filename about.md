@@ -4,11 +4,11 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
+Open source enthusiast, linux/unix devops and sysadmin with focus on infrastructure, AWS cloud computing, clustering and high availability.
 
 ### More Information
 
-A place to include any other types of information that you'd like to include about yourself.
+Husband and father, in love with the ocean, MotoGP and F1.
 
 ### Contact me
 
